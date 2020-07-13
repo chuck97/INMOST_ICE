@@ -1,1 +1,1 @@
-Hello, World!
+INMOST_ICE
