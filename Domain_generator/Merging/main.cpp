@@ -1,25 +1,27 @@
 #include "contours_merging.h"
+#include <iostream>
 
 const std::string RESOLUTION = "crude";
-const bool ISLANDS           = false;
 
 int main()
 {
   Euler_rotation_info<double> rotation(ALPHA_DEF, BETA_DEF, GAMMA_DEF);
 
-  std::string input_path = "../Coastline/arctic_" + RESOLUTION + ".txt";
-  std::string output_path_islands = "../Domain/data/arctic_" + RESOLUTION + "_domain_islands.txt";
-  std::string output_path_external = "../Domain/arctic_" + RESOLUTION + "_domain_external.txt";
-  if (ISLANDS)
+  std::string input_path = "../../Coastline/arctic_" + RESOLUTION + ".txt";
+  std::string output_path_islands = "../../Domain/data/arctic_" + RESOLUTION + "_domain_islands.txt";
+  std::string output_path_external = "../../Domain/data/arctic_" + RESOLUTION + "_domain_external_parts.txt";
+  
+  //Islands
   {
     Contour_Database<double> db(input_path, output_path_islands, rotation.Get_REVERSE());
     db.MakeClosedDomain();
-    db.WriteToFile(ISLANDS);
+    db.WriteToFile(true);
   }
-  else
+  
+  //External boundary parts
   {
-    Contour_Database<double> db(input_path, output_path_external, rotation.Get_REVERSE());
-    db.MakeClosedDomain();
-    db.WriteToFile(ISLANDS);
+	Contour_Database<double> db(input_path, output_path_external, rotation.Get_REVERSE());
+	db.MakeClosedDomain();
+    db.WriteToFile(false);
   }
 }
