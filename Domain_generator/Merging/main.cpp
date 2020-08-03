@@ -16,6 +16,7 @@ int main()
     Contour_Database<double> db(input_path, output_path_islands, rotation.Get_REVERSE());
     db.MakeClosedDomain();
     db.WriteToFile(true);
+    std::system("python ./plot_islands.py");
   }
   
   //External boundary parts
@@ -23,5 +24,6 @@ int main()
 	Contour_Database<double> db(input_path, output_path_external, rotation.Get_REVERSE());
 	db.MakeClosedDomain();
     db.WriteToFile(false);
+    std::system("python ./plot_external_parts.py");
   }
 }

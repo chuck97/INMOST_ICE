@@ -1,0 +1,62 @@
+*** Objectives ***
+
+Two programs demonstrate two approaches to the iterative adaptive solution of the
+boundary value problem:
+
+   -div (grad u) = 0  in  Omega
+               u = g  on  dOmega_D
+          du/dn  = 0  on  dOmega_N
+
+where 
+           Omega = { x^2 + y^2 < 1 \ {y=0, 0<x<1} }
+        dOmega_N = { y=0, 0<x<1, bottom part of the cut line}
+        dOmega_D = { x^2 + y^2 = 1} .OR. {y=0, 0<x<1, above part of the cut line}
+
+and
+               g = r^0.25 sin phi/4
+
+
+*** Contents ***
+   main_hes.f  - Main program with calls routines from Ani2D libraries.
+                 The linear systems  are solved by the direct sparse factorizer.
+                 The metric is recovered from the discrete Hessian of the solution 
+                 so that the L_infty norm of the "interpolation error" be minimized.
+
+   forlibfem_hes.f - The user-prepared file for the library libfem2D (matrix 
+                 and right-hand side generators). It provides also routines
+                 for computing the diffusion tensor, boundary conditions 
+                 and the right-hand side.
+           
+   main_est.f  - Main program with calls routines from Ani2D libraries.
+                 The linear systems  are solved by the iterative solver with ILU preconditioner.
+                 The metric is recovered from the edge-based a posteriori error estimates
+                 so that the L_2 norm of the gradient of discretization error be minimized.
+           
+   forlibfem_est.f - The user-prepared file for the library libfem2D (matrix 
+                 and right-hand side generators, and routines for a posteriori error estimator). 
+                 It provides also routines
+                 for computing the diffusion tensor, boundary conditions 
+                 and the right-hand side.
+           
+
+   forlibaft.c - File for library libaft2D (initial mesh generator). 
+                 It provides the parameterization function for the curved 
+                 boundary. The name of the function is passed to the 
+                 libaft2D using 
+
+                     external userboundary              
+                     call registeruserfn(userboundary)
+
+                 If both the registration and the model forlibaft.c are 
+                 missing, the boundary should be given by a polyline.
+
+
+   forlibmba.f - The user-prepared file for the library libmba2D (metric based 
+                 mesh adaptation). It provides the parameterization function of 
+                 the curved boundary. It should be the same as in forlibaft.c 
+                 but written in FORTRAN77.
+
+
+ 
+
+

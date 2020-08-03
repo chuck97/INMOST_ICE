@@ -1,0 +1,29 @@
+Project name:   L2 FINITE ELEMENT PROJECTION.
+
+Package name:  Ani2D-PRJ.
+
+Documentation: doc/user_guide.pdf
+
+1. What is Ani2D-PRJ ?
+  The Fortran package Ani2D-PRJ project a finite element solution from
+one unstructured triangular mesh to another. The solution may belong
+to different finite element spaces on different meshes. The meshes should
+occupy the same region. Otherwise, the package behavior is unclear.
+
+This directory presents one example of using the libraty lib2Dprj.a 
+A given P1 finite solution on one mesh is projected on a P2 finite element
+solution on the other mesh. 
+
+
+2. Quick Start
+
+   * build all libraries 'make lib'
+   * read documentation  'acroread user_guide.pdf'
+   * cd src/Tutorials/PackagePRJ
+   * make exe
+   * make run
+   * make gs-grd
+   * make gs-rsl
+   * make clean
+
+

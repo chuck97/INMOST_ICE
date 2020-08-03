@@ -1,0 +1,28 @@
+We provide two equivalent installation algoritms.
+
+=============  1. CMAKE  ==============
+
+Cmake simplifies package installation on various platforms 
+Visit http://www.cmake.org for more details.
+
+$ mkdir build
+$ cd build
+$ cmake ../
+$ make install
+
+
+=============  2. MAKEFILEs  ===============
+
+We created simplified Makefiles in every directory. 
+Type 'make help' for more details.
+
+$ vi src/Rules.make 
+provide correct names and options for FORTRAN and C compilers 
+
+$ make libs
+$ make packages
+
+
+Illustration of package capabilities is discribed in README.
+
+

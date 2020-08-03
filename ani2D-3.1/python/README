@@ -1,0 +1,13 @@
+This code was created originally to observe impact of metric change on 
+the adaptive mesh. The simple intuitive interface allows to select a 
+metric and re-build the mesh. The user may look at the initial mesh and 
+compare it with the adaptive mesh. 
+
+The new features of this script allows to run some of the test problems
+in Tutorials and even modify they behavior via selection of a few control
+parameters. At the moment, the user can modify only one tutorial in 
+MultiPackage/Stokes. To run the Python script, type 
+
+   $ python main.py
+
+

@@ -1,0 +1,41 @@
+*** Objectives ***
+The package demonstrates the iterative adaptive solution of the
+boundary value problem:
+
+  -div D grad u + vx * du/dx + vy * du/dy = 1 in Omega
+                                        u = 0 on dOmega
+where Omega has a backstep-like shape.
+
+The diffusion coefficient D is the diagonal tensor given by
+     D = diag{0.01,0.01}
+
+The components of the convection vector are
+     vx = 3
+     vy = 2
+The convection field is passed to FEM library through DATAFEM array.
+
+The SUPG stabilization is NOT used here, since the adaptive mesh 
+itself stabilizes the discretization.
+
+HOW TO RUN:
+make exe
+make run
+make gs
+make clean
+
+*** Contents ***
+   main.f      - Main program with calls routines from the libraries
+
+
+   forlibfem.f - The user-prepared file for the library libfem2D (matrix 
+                 and right-hand side generators). It provides routines
+                 for computing the diffusion tensor, convection field, boundary conditions 
+                 and the right-hand side.
+
+   forlibmba.f - The user-prepared file for the library libmba2D (metric 
+                 based mesh adaptation). The routines provide parameterization 
+                 functions for curvelinear boundaries and metric. 
+                 Since the computational domain is a polygon, these
+                 functions are dummy functions.
+ 
+

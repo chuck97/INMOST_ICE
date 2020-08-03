@@ -1,0 +1,24 @@
+Package aniFEM: 
+- Added group bits to arrays template[R,C]. Restructured the assembling procedure.
+- Fixed a few bugs that were not revealed by tutorials.
+
+Package aniPy:
+- Upgraded python code to comply with changes made to the aniAFT package.
+
+Package aniMBA:
+- Allowed mesh rescaling to be used mutiple times.
+
+Package aniPRJ:
+- Added missing mesh rescaling back to the physical domain.
+- Fixed incorrect calculation of a shift in a local-to-global map. 
+
+Package aniAFT:
+- Added memory release to function opt_func().
+
+Package aniLU:
+- Upgraded external package UMFPACK to version 5.1.0.
+- Simplified installation procedure for UMFPACK.
+
+
+*** 08/20/2011 Version 3.0 was released
+

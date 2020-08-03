@@ -1,0 +1,149 @@
+===========================  OVERVIEW  =================================
+Get the latest version at sourceforge.net/projects/ani2d
+
+Our goal is to study numerically and theoretically new adaptive 
+methods for solving systems of partial differential equations (PDEs). 
+To achieve this goal, we have developed the following software 
+packages (located in directory src/):
+
+   aniAFT - generation of triangular meshes using the advanced front
+            technique. It generates a mesh for other packages starting
+            from either a set of curvilinear polylines or a set of 
+            mesh edges.
+
+   aniRCB - local hierarchical refinement and coarsening of triangular 
+            meshes using the bisection method. It takes on input any 
+            conformal mesh, refines and/or coarsens it preserving the 
+            shape quality of the input triangles.
+
+   aniMBA - generation (or re-generation) of adaptive triangular
+            meshes which are quasi-uniform in a metric. The metric may
+            be given analytically, to generate a mesh with desired
+            properties, or may be computed from a discrete solution, 
+            to generate a mesh adapted to this solution.
+
+   aniFEM - generation of finite element matrices for different types
+            of finite elements, bilinear and linear forms.
+
+   aniLU  - a black box solver for sparse linear systems based on the
+            package UMFPACK, version 4.1.
+
+   aniILU - an incomplete LU iterative solver for sparse linear systems 
+            with non-singular matrices. It is the alternative to 
+            package aniLU.
+
+   aniINB - a black box iterative solver for systems of nonlinear 
+            equations based on the inexact Newton-Krylov backtracking 
+            method.
+
+   aniLMR - generation of nodal tensor metrics from either a nodal 
+            discrete solution (via a discrete Hessian recovery) or from
+            cell-based or edge-based error estimates.
+
+   aniPRJ - interpolates finite element data from one mesh to another 
+            using a supermesh, which is intersection of two meshes. 
+
+   aniVIEW- a simple visualizing library producing Postscript-files 
+            of a mesh and isolines of a discrete solution.
+
+   aniC2F - a simple C-wrapper to call mesh generation routines from
+            package aniMBA in a C or C++ program.
+
+------------------------------------------------------------------------
+Please look inside README files in src/aniXXX for more detail
+------------------------------------------------------------------------
+
+The current release includes all the above packages plus a few 
+supplementary packages:
+
+   lapack - a collection of a few linear algebra algorithms (Real*8). 
+            We recommend to use the corresponding system library if you
+            have one.
+
+   blas   - a collection of basic linear algebra Real*8 subroutines such
+            as x*y, a*x+y, etc where x and y are vectors.  We recommend 
+            to use the corresponding system library if you have one.
+
+
+
+=======================  INSTALLATION DETAILS  =========================
+
+We provide two methods to compile and install the package. Instructions 
+are in file INSTALL. The first method uses 'cmake' and requires minimal
+user interference. The second method uses a simplified 'Makefile'. User
+should set up compiler names (FORTRAN and C) and compilation options in 
+the file src/Rules.make. 
+
+Installation and demonstration of capabilities can be overlapped using 
+the script in file INSTALLandDEMO. This script uses the second 
+installation method. 
+
+Comments for specific OS can be found in directory cmake/.
+
+
+=========================  RUNNING DEMOs  ==============================
+
+We propose five complementary approaches for learning capabilities of
+the developed packages:
+
+  1. Read PDF document doc/user_guide.pdf
+
+  2. Study TUTORIALs located in srs/Tutorials. Elementary examples of
+     using individual packages are present in subdirectories
+     srs/Tutorials/PackageXXX. Look inside each package and study 
+     examples in files mainXXX.f. We prepared extensive comments to 
+     facilitate code understanding.
+
+  3. Study more complex TUTORIALs located in srs/Tutorials/MultiPackage.
+     We prepared a several examples of different combinations of individual
+     packages:
+
+     Interpolation/    is a simple example generating an adaptive mesh 
+                       to minimize the maximum error of P_1 interpolation
+
+     IsotropicBVP/     is an example of solving an elliptic boundary 
+                       value problem (BVP) with isotropic singularity 
+                       using an adaptive mesh. The domain is a disk with 
+                       a cut.
+
+     NonisotropicBVP1/ is an example of solving an elliptic BVP with
+                       anisotropic singularity and jumping coefficients
+                       using an adaptive mesh. The domain is the disk 
+                       without one quadrant.
+
+     NonisotropicBVP2/ is an example of solving an elliptic BVP with
+                       four boundary layers in a polygonal domain. 
+                       The adaptive mesh is anisotropic.
+
+     ConvectionDiffusion/ is an example of the FEM solution of the 
+                       convection-diffusion equation
+
+     HybridMixedFem/   is an example of hybrid mixed finite element
+                       discretization of the Poisson equation
+
+     Stokes/           is an example of mixed P2-P1 discretization of the
+                       Stokes problem in a polygonal domain with a hole.
+
+     StokesNavier/     is an example of mixed P2-P1 discretization of the
+                       Navier-Stokes problem (lid driven cavity).
+
+     UnsteadyConDif/   is an example of the FEM solution of the unsteady 
+                       convection-diffusion equation with the SUPG 
+                       stabilization.
+
+     PosterioriEstimates/ is an example of the adaptive P_1 FEM solution 
+                       of a diffusion problem using edge-based a posteriori 
+                       error estimates.
+
+
+  4. Run a single test using 'make test-XXX'. This approach requires to
+     install the package using one of the two methods described in the
+     previous section. If 'cmake' was used to install the package, then
+     name for the Postscript viewer has to be set up in src/Rules.make. 
+
+  5. A simple python program allowing to change a metric and to generate 
+     the adaptive mesh. Both the initial and the adaptive meshes are 
+     displayed. The program allows the user to run a few tutorials provided
+     that the package has been installed. This program is experimental.
+     
+

@@ -1,0 +1,56 @@
+The program main.f demonstrates the use of local refinement/coarsening 
+tool librcb2D.a based on the Marked Edge Bisection. It starts from a 
+simple coarse triangulation, refines it nlevel times according to the 
+rule given in RefineRule, and coarse the refined mesh nlevel times 
+according to the rule given in CoarseRule. Examples of RefineRule, 
+CoarseRule are given in main.f. Initial bisection of each element is 
+defined in InitializeMeshData (aux.f).
+
+Caution! Even if the coarsed mesh looks like the initial,
+         the orientation within triangles may be changed!
+
+Caution! Curve-linear boundary edges are processed as straight: 
+         no crv data are on input/output.
+
+
+The program uses routine graph() from libview2D.a. Therefore, 
+visualization library libview2D.a has to be installed prior linking.
+The library librcb2D.a uses routine errMes() from libmba2D.a. To avoid 
+linking  libmba2D.a, we added errMes()  at the end of main.f.
+
+On output 3 ps-pictures of the initial mesh, refined mesh and coarsed 
+mesh are produced in bin/:
+
+ini.ps ref.ps crs.ps
+
+
+The user must
+  1) provide an initial triangulation in main.f
+  2) make user routines of rules of refinement/coarsening similar 
+     to RefineRule, CoarseRule in main.f
+
+Then the user can:
+  3) make lib   # this creates the library librcb2D.a
+  4) make exe   # compiles main.f and produces the executable
+  5) make run   # runs the executable
+  6) make gs-ini gs-ref gs-crs  # shows ps-pictures of the initial, 
+                                  refined, coarsed meshes.
+
+The mesh is stored the following format:
+  nv,nt,nb                       number of points, triangles and boundary edges
+  (tri(i,j),i=1,3),j=1,nt)       connectivity table,
+  (material(i),i=1,nt)           labels/materials of triangles,
+  (bnd(4,i),i=1,nb)              connectivity table for boundary edges, 
+                                 and edge labels
+  (vrt(2,i),i=1,nv)              coordinates of nodes.
+
+
+Files:
+   main.f:     main pogram and example of user-defined rules for local 
+               refinement and coarsening;
+Library files:
+   refine.f:   refine the mesh and tools for the refinement;
+   coarse.f:   coarse the mesh and tools for the coarsening;
+   aux.f:      initialize data structure, orient triangles and mark the 
+               neighbors, recover boundary edges
+    

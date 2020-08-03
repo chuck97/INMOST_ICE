@@ -1,0 +1,10 @@
+cmake  \
+  -DCMAKE_Fortran_COMPILER:FILEPATH=/opt/intel/bin/ifort  \
+  -DCMAKE_C_COMPILER:FILEPATH=/opt/intel/bin/icc  \
+  -DCMAKE_CXX_COMPILER:FILEPATH=/opt/intel/bin/icpc  \
+  ../
+
+# Intel compiler 14.0 may generate incorrect code with optimization option "-O3".
+# The workaroud is 
+#  -DCMAKE_Fortran_FLAGS_RELEASE:STRING="-O2"  \
+

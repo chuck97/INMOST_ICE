@@ -1,0 +1,5 @@
+      Integer   AniMinInterval
+      Parameter(AniMinInterval = 20)
+
+      Integer   AniMinFraction,     AniMaxFraction 
+      Parameter(AniMinFraction = 4, AniMaxFraction = 2)

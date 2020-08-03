@@ -1,0 +1,45 @@
+*** Objectives ***
+
+The program demonstrates the iterative adaptive solution of the
+boundary value problem:
+
+   -div grad u  + grad p = 0   in Omega
+         div u           = 0   in Omega
+
+                       u = 0   on dOmega_1
+                       u = u_0 on dOmega_2
+                   du/dn = 0   on dOmega_3
+
+where Omega is a domain with a circle hole,  dOmega_1 is the side 
+at x=-2, dOmega_3 is the side at x=2, and dOmega_2 is the rest of 
+the boundary. The non-homogeneous boundary condition is 
+
+   u_0 = { 1-4y^2), 0 }.
+
+We use the P2 finite elements for the velocity u and P1 finite elements 
+for the pressure p, which are known to be stable. The discretization 
+method results in a symmetric indefinite matrix.
+
+
+*** Contents ***
+   main.f      - Main program with calls routines from the libraries
+
+   forlibaft.f - File for library libaft2D-3.x.a (mesh generator of initial mesh). 
+                 It provides parameterization functions for the curved 
+                 boundaries. The name of the function is passed to the 
+                 libaft2D using 
+
+                     external userboundary              
+                     call registeruserfn(userboundary)
+
+
+   forlibfem.f - The user-prepared file for the library libfem2D (matrix 
+                 and right-hand side generators). It provides routines
+                 for computing the matrix and the right-hand side.
+
+
+   forlibmba.f - The user-prepared file for the library libmba2D-2.x.a 
+                 (metric-based mesh adaptation). It provides parameterization 
+                 functions of the curved boundary. It should be the same 
+                 as in forlibaft.c but be written in FORTRAN-77.
+

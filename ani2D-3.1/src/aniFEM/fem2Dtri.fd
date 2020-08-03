@@ -1,0 +1,210 @@
+C ======================================================================
+C               FINITE ELEMENTS
+C ======================================================================
+      Integer   FEM_P0,     FEM_P1,     FEM_P2,     FEM_P3
+      Parameter(FEM_P0 = 1, FEM_P1 = 2, FEM_P2 = 3, FEM_P3 = 4)
+
+      Integer   FEM_P4
+      Parameter(FEM_P4 = 5)
+
+      Integer   FEM_P1vector,      FEM_P2vector
+      Parameter(FEM_P1vector = 11, FEM_P2vector = 12)
+
+      Integer   FEM_P2reduced,      FEM_MINI
+      Parameter(FEM_P2reduced = 13, FEM_MINI = 14)
+
+      Integer   FEM_RT0,      FEM_RT1,      FEM_BDM1
+      Parameter(FEM_RT0 = 21, FEM_RT1 = 22, FEM_BDM1 = 23)
+
+      Integer   FEM_CR1,      FEM_CR1vector
+      Parameter(FEM_CR1 = 31, FEM_CR1vector = 32)
+
+      Integer   FEM_HERMIT,      FEM_ARGYRIS
+      Parameter(FEM_HERMIT = 33, FEM_ARGYRIS = 34)
+
+      Integer   MaxDOFs,      MaxSize,      MaxSizeDG
+      Parameter(MaxDOFs = 21, MaxSize = 21, MaxSizeDG = 40)
+
+C ======================================================================
+C               OPERATORS
+C ======================================================================
+      Integer   IDEN,     GRAD,     DIV,     CURL
+      Parameter(IDEN = 1, GRAD = 2, DIV = 3, CURL = 4)
+
+      Integer   DUDX,     DUDY,     DUDN
+      Parameter(DUDX = 8, DUDY = 9, DUDN = 10)
+
+C ======================================================================
+C               TENSOR INFORMATION
+C ======================================================================
+      Integer   TENSOR_NULL,     TENSOR_SCALAR
+      Parameter(TENSOR_NULL = 1, TENSOR_SCALAR = 2)
+
+      Integer   TENSOR_SYMMETRIC,     TENSOR_GENERAL     
+      Parameter(TENSOR_SYMMETRIC = 4, TENSOR_GENERAL = 8) 
+
+      Integer   TENSOR_RESERVED     
+      Parameter(TENSOR_RESERVED = 16) 
+
+
+C ======================================================================
+C               BOUNDARY CONDITIONs
+C ======================================================================
+      Integer   BC_DIRICHLET,      BC_NEUMANN,      BC_ROBIN
+      Parameter(BC_DIRICHLET = 32, BC_NEUMANN = 64, BC_ROBIN = 128)
+
+      Integer   BC_ROBIN_COEF,       BC_NULL
+      Parameter(BC_ROBIN_COEF = 256, BC_NULL = 512)
+
+      Integer   MaxTensorSize
+      Parameter(MaxTensorSize = 4)
+
+
+C ======================================================================
+C               DEGREES OF FREEDOM
+C ======================================================================
+      Integer   Vdof,     Rdof,     Edof
+      Parameter(Vdof = 1, Rdof = 2, Edof = 4)
+
+      Integer   RdofOrient
+      Parameter(RdofOrient = 8)
+
+      Integer   VectorX,     VectorY
+      Parameter(VectorX = 0, VectorY = 16)
+
+      Integer   Group1,      Group2,      Group3,       Group4
+      Parameter(Group1 = 32, Group2 = 64, Group3 = 128, Group4 = 256)
+
+      Integer   Group5,       Group6,        Group7
+      Parameter(Group5 = 512, Group6 = 1024, Group7 = 2048)
+
+      Integer   Group8,        Group9,        Group10
+      Parameter(Group8 = 4096, Group9 = 8192, Group10 = 16384)
+
+      Integer   MaxNumGroups
+      Parameter(MaxNumGroups = 10)
+
+C ======================================================================
+C               DEGREES OF FREEDOM for DG
+C ======================================================================
+      Integer   DGdof
+      Parameter(DGdof = 32)
+
+      Integer   DGdof12,      DGdof23,       DGdof31
+      Parameter(DGdof12 = 64, DGdof23 = 128, DGdof31 = 256)
+
+
+C ======================================================================
+C               NUMERICAL INTEGRATION PARAMETERS
+C ======================================================================
+C  MaxPointGauss = maximal number of Gauss points for volume integration
+C  MaxPnt2DGauss = maximal number of Gauss points for edge integration
+C ======================================================================
+      Integer   LDG1,     LDG2,     LDG5,     LDG6,      LDG9
+      Parameter(LDG1 = 1, LDG2 = 3, LDG5 = 7, LDG6 = 12, LDG9 = 19)
+
+      Integer   LDGX
+      Parameter(LDGX = 37)
+
+      Integer   MaxPointGauss, AllPointGauss
+      Parameter(MaxPointGauss = LDGX)
+      Parameter(AllPointGauss = LDG1 + LDG2 + LDG5 + LDG6 + LDG9 + LDGX)
+
+      Integer   MaxPnt2DGauss,     AllPnt2DGauss
+      Parameter(MaxPnt2DGauss = 5, AllPnt2DGauss = 9) 
+      
+
+c ... order = 1 (1 point)
+      Real*8    T1A, W1A
+      Parameter(T1A = 0.33333333333333D0, W1A = 1D0)
+
+c ... order = 2 (3 points)
+      Real*8    T2A, T2B, W2A
+      Parameter(T2A = 0.0D0, T2B = 0.5D0)
+      Parameter(W2A = 0.33333333333333D0)
+
+c ... order = 5 (7 points)
+      Real*8    T5A, T5B, T5C, T5D, T5E, W5A, W5B, W5C
+      Parameter(T5A = 0.33333333333333D0)
+      Parameter(W5A = 0.225D0)
+
+      Parameter(T5B = 0.797426985353087D0, T5C = 0.101286507323456D0)
+      Parameter(W5B = 0.125939180544827D0)
+
+      Parameter(T5D = 0.0597158717897698D0, T5E = 0.470142064105115D0)
+      Parameter(W5C = 0.132394152788506D0)
+
+c ... order = 6 (12 points)
+      Real*8    T6A, T6B, T6C, T6D, T6E, T6F, T6G, W6A, W6B, W6C
+      Parameter(T6A = 0.873821971016996D0, T6B = 0.063089014491502D0)
+      Parameter(W6A = 0.050844906370207D0)
+
+      Parameter(T6C = 0.501426509658179D0, T6D = 0.249286745170910D0)
+      Parameter(W6B = 0.116786275726379D0)
+
+      Parameter(T6E = 0.636502499121399D0, T6F = 0.310352451033785D0)
+      Parameter(                           T6G = 0.053145049844816D0)
+      Parameter(W6C = 0.082851075618374D0)
+
+c ... order = 9 (19 points)
+      Real*8    T9A, T9B,T9C, T9D,T9E, T9F,T9G, T9H,T9I, T9J,T9K,T9L
+      Real*8    W9A, W9B,     W9C,     W9D,     W9E,     W9F
+      Parameter(T9A = 0.33333333333333333D0)
+      Parameter(W9A = 0.09713579628279610D0)
+c     Parameter(W9A = 0.0971357962827988338D0)
+
+      Parameter(T9B = 0.0206349616025259D0, T9C = 0.4896825191987370D0)
+      Parameter(W9B = 0.03133470022713983D0)
+
+      Parameter(T9D = 0.1258208170141290D0, T9E = 0.4370895914929355D0)
+      Parameter(W9C = 0.07782754100477543D0)
+
+      Parameter(T9F = 0.6235929287619356D0, T9G = 0.1882035356190322D0)
+      Parameter(W9D = 0.07964773892720910D0)
+
+      Parameter(T9H = 0.9105409732110941D0, T9I = 0.0447295133944530D0)
+      Parameter(W9E = 0.02557767565869810D0)
+
+      Parameter(T9J = 0.7411985987844980D0, T9K = 0.2219628891607657D0)
+      Parameter(                            T9L = 0.0368384120547363D0)
+      Parameter(W9F = 0.04328353937728940D0)
+
+c ... order = 13 (37 points)
+      Real*8    TXA, TXB,TXC, TXD,TXE, TXF,TXG, TXH,TXI, TXJ,TXK
+      Real*8    WXA, WXB,     WXC,     WXD,     WXE,     WXF
+      
+      Real*8    TXL,TXM, TXN,TXO,TXP, TXR,TXS,TXT, TXU,TXV,TXW
+      Real*8    WXG,     WXH,         WXI,         WXJ
+      Parameter(TXA = 0.33333333333333333D0)
+      Parameter(WXA = 0.051739766065744133555179145422D0)
+
+      Parameter(TXB = 0.95027566292410556D0,TXC = 0.02486216853794721D0)
+      Parameter(WXB = 0.008007799555564801597804123460D0)
+
+      Parameter(TXD = 0.17161491492383534D0,TXE = 0.41419254253808232D0)
+      Parameter(WXC = 0.046868898981821644823226732071D0)
+
+      Parameter(TXF = 0.53941224367719044D0,TXG = 0.23029387816140477D0)
+      Parameter(WXD = 0.046590940183976487960361770070D0)
+
+      Parameter(TXH = 0.77216003667653256D0,TXI = 0.11391998166173371D0)
+      Parameter(WXE = 0.031016943313796381407646220131D0)
+
+      Parameter(TXJ = 0.00908539994983535D0,TXK = 0.49545730002508232D0)
+      Parameter(WXF = 0.010791612736631273623178240136D0)
+
+      Parameter(TXL = 0.06227729030588699D0,TXM = 0.46886135484705650D0)
+      Parameter(WXG = 0.032195534242431618819414482205D0)
+
+      Parameter(TXN = 0.85130650417434855D0,TXO = 0.12661720617202709D0)
+      Parameter(                            TXP = 0.02207628965362440D0)
+      Parameter(WXH = 0.015445834210701583817692900053D0)
+
+      Parameter(TXR = 0.68944197072859129D0,TXS = 0.29193750646888777D0)
+      Parameter(                            TXT = 0.01862052280252096D0)
+      Parameter(WXI = 0.017822989923178661888748319485D0)
+
+      Parameter(TXU = 0.63586785943387276D0,TXV = 0.26762565927396796D0)
+      Parameter(                            TXW = 0.09650648129215922D0)
+      Parameter(WXJ = 0.037038683681384627918546472190D0)
+

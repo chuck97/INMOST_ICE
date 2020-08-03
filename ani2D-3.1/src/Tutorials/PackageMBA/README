@@ -1,0 +1,29 @@
+Project name:  Flexible Mesh Generator Using Metric Based Adaptation
+
+Package name:  Ani2D-MBA.
+
+Documentation: doc/user_guide.pdf
+
+1. What is Ani2D-MBA?
+  The FORTRAN-77 package Ani2D-MBA (re-)generates adaptive triangular
+  meshes which are quasi-uniform in a metric. The metric may
+  be given analytically, to generate a mesh with desired
+  properties, or may be computed from a discrete solution,
+  to generate a mesh adapted to this solution.
+  The package can also improve the mesh quality and untangle meshes.
+
+
+
+2. Quick Start
+
+   1. read documentation in doc/user_guide.pdf
+   2. install packages aniMBA, aniLMR, aniVIEW, lapack, blas
+   3. cd src/Tutorials/PackageMBA
+   4. make exe
+   5. make run-ana gs-ini gs-fin
+   6. make run-nod gs-ini gs-fin
+   7. make run-fix gs-ini gs-fin
+   8. make run-tng gs-ini gs-fin
+   9. make run-tri gs-ini gs-fin
+  10. make clean
+

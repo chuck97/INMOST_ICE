@@ -1,0 +1,4 @@
+make exe
+make run
+make gs
+make clean

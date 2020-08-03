@@ -1,0 +1,19 @@
+*** Objective.
+
+The program main.f builds a mesh which minimizes the Lp norm
+of interpolation error for function Func(x,y) defined in main.f.
+The metric is defined on the basis of the recovered discrete Hessian.
+
+The program mainGrad.f builds a mesh which minimizes the Lp norm of
+the gradient of interpolation error for function Func(x,y) defined in mainGrad.f.
+The metric is defined on the basis of interpolation errors at mid-edges.
+
+These programs provide  examples of the adaptive loop and how to recover the metric
+and to estimate the norm of the interpolation error.
+
+The initial mesh is created starting from boundary edges using 
+library libaft2D-3.x.a
+
+ 
+
+

@@ -1,0 +1,29 @@
+*** Objectives ***
+The package demonstrates the iterative adaptive solution of the
+boundary value problem:
+
+  -div D grad u + du/dx = 1 in Omega
+                      u = 0 on dOmega
+
+  where Omega = [0;1]x[0;1] - [0;1/3]x[0;0.5] (double rump example)
+
+The diffusion coefficient D is the diagonal tensor given by
+            D = diag{0.001,0.001}
+
+The SUPG stabilization is NOT used here, since the adaptive mesh
+itself stabilizes the discretization. The convection term is discretized
+using operator DUDX (=du/dx).
+
+
+
+
+*** Contents ***
+   main.f      - Main program with calls routines from the libraries
+
+
+   forlibfem.f - The user-prepared file for the library libfem2D (matrix 
+                 and right-hand side generators). It provides routines
+                 for computing the diffusion tensor, boundary conditions 
+                 and the right-hand side.
+
+

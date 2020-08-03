@@ -1,0 +1,24 @@
+Project name:  2D GENERATOR OF UNSTRUCTURED TRIANGULAR MESHES.
+
+Package name:  Ani2D-AFT.
+
+Documentation: doc/user_guide.pdf
+
+1. What is Ani2D-AFT?
+  The C package Ani2D-AFT generates unstructured triangular meshes 
+  using the advanced front technique. It provides a few way to define
+  the initial front.
+
+
+2. Quick Start
+
+   1. read documentation in doc/user_guide.pdf
+   2. cd src/aniAFT
+   3. make lib
+   4. cd src/Tutorials/PackageAFT
+   5. make exe
+   6. make run-bnd gs
+   7. make run-ana gs
+   8. make run-frt gsgs
+   9. make run-fr2 gs
+  10. make clean

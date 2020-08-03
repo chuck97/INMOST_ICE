@@ -1,0 +1,27 @@
+*** Objectives ***
+The package demonstrates the finite element (P_1 SUPG stabilized) solution 
+of the unsteady boundary value problem:
+
+  du/dt - div (D grad u) + vx * du/dx + vy * du/dy = 0  in  Omega
+                                                 u = g  on  dOmega
+  where Omega = [0;1]x[0;1]
+
+The diffusion coefficient D is the diagonal tensor given by
+     D = diag{0.0001, 0.0001}
+
+The components of the convection vector are
+     vx = 1
+     vy = 0
+
+
+
+*** Contents ***
+   main.f      - Main program with calls routines from the libraries
+
+
+   forlibfem.f - The user-prepared file for the library libfem2D (matrix 
+                 and right-hand side generators). It provides routines
+                 for computing the diffusion tensor, boundary conditions 
+                 and the right-hand side.
+
+ 

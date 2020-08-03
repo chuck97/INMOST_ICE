@@ -1,0 +1,200 @@
+#!/bin/sh
+# =======================================================
+#         Quick start for everything                    
+# =======================================================
+# Requirement: set up macros for compilers and PostScript
+#              viewer in file src/Rules.make.
+#  
+#        For python application you may need to install
+#        the following packages; tkinter, python-imaging-tk 
+
+
+export MAKE=make
+# provides MAKE for this script
+
+cd src/Tutorials/
+
+clear
+echo '======================================================='
+echo '      Learn about individual packages (AFT)            '
+echo '         (Advanced Front Technique)                    '
+echo '======================================================='
+cd PackageAFT
+make help 
+$MAKE run-bnd gs 
+$MAKE run-ana gs
+$MAKE run-frt gs
+$MAKE run-fr2 gs
+cd ..
+
+
+#clear
+echo '======================================================='
+echo '     Learn about individual packages (RCB)             '
+echo '     (Hierarchical Refinement and Coarsening)          '
+echo '======================================================='
+cd PackageRCB
+$MAKE help
+$MAKE exe run 
+$MAKE gs-ini gs-ref gs-crs
+cd ..
+
+
+#clear
+echo '======================================================='
+echo '     Learn about individual packages (LMR)             '
+echo '     (Local Metric Recovery)                           '
+echo '======================================================='
+cd PackageLMR
+$MAKE help
+$MAKE run-nod
+$MAKE run-est
+$MAKE run-grd
+cd .. 
+
+
+#clear
+echo '======================================================='
+echo '     Learn about individual packages (MBA)             '
+echo '     (Metric-Based Adaptation)                         '
+echo '======================================================='
+cd PackageMBA
+$MAKE help
+$MAKE run-ana gs-ini gs-fin
+$MAKE run-nod gs-ini gs-fin
+$MAKE run-fix gs-ini gs-fin
+$MAKE run-tng gs-ini gs-fin
+cd ..
+
+
+#clear
+echo '======================================================='
+echo '     Learn about individual packages (FEM)             '
+echo '     (Finite Element Method)                           '
+echo '======================================================='
+cd PackageFEM
+$MAKE help
+$MAKE run-triangle 
+$MAKE run-bc
+$MAKE run-stokes
+cd ..
+
+
+#clear
+echo '======================================================='
+echo '     Learn about individual packages (ILU)             '
+echo '     (Incomplete LU sparse factorization)              '
+echo '======================================================='
+cd PackageILU
+$MAKE help
+$MAKE ilu0 
+$MAKE ilu2
+#compare the number of iterations
+cd ..
+
+
+#clear
+echo '======================================================='
+echo '     Learn about individual packages (INB)             '
+echo '     (Inexact Newton-Krylov Backtracking solver)              '
+echo '======================================================='
+cd PackageINB
+$MAKE help
+$MAKE run-simple
+$MAKE run-bratu
+cd ..
+
+
+#clear
+echo '======================================================='
+echo '     Learn about individual packages (C2F)             '
+echo '     (C to Fortran wrapper)                            '
+echo '======================================================='
+cd PackageC2F
+$MAKE help
+$MAKE run-ana gs
+$MAKE run-nod gs
+cd ..
+
+
+#clear
+echo '======================================================='
+echo '     Learn about how to use packages together          '
+echo '======================================================='
+cd MultiPackage/
+
+cd Interpolation
+$MAKE help
+cat README
+$MAKE run-int gs
+$MAKE run-grd gs
+cd ..
+
+cd IsotropicBVP
+$MAKE help
+cat README
+$MAKE run-hes gs
+$MAKE run-est gs
+cd ..
+
+cd NonisotropicBVP1
+$MAKE help
+cat README
+$MAKE run gs
+cd ..
+
+cd NonisotropicBVP2
+$MAKE help
+cat README
+$MAKE run gs
+cd ..
+
+cd ConvectionDiffusion; make help
+cat README
+$MAKE run gs
+cd ..
+
+cd UnsteadyConDif
+$MAKE help
+cat README
+$MAKE run gs
+cd ..
+
+cd HybridMixedFem
+$MAKE help
+cat README
+$MAKE run gs
+cd ..
+
+cd DiscontinuousGalerkin
+$MAKE help
+$MAKE run gs
+cd ..
+
+cd PosterioriEstimates
+$MAKE help
+cat README
+$MAKE run gs
+cd ..
+ 
+cd Stokes
+$MAKE help
+cat README
+$MAKE run gs
+cd ..
+
+cd StokesNavier
+$MAKE help
+cat README
+$MAKE run gs
+cd ..
+
+#clear
+echo '======================================================='
+echo '     Learn about GUI (Graphical User Interface)        '
+echo '======================================================='
+cd ../../../python
+make exe
+python main.py
+
+

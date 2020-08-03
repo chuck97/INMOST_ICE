@@ -1,0 +1,23 @@
+Project name:  C-wrappers for libraries of package Ani2D-3.x
+
+Package name:  Ani2D-C2F.
+
+
+1. What is Ani2D-C2F?
+   The package contains C-wrappers for Fortran mesh generation routines 
+in library aniMBA. It tries to hide memory management to reduce the list
+of dummy parameters in C-routines.
+Next package to be wrapped is aniFEM.
+
+
+2. Quick Start 
+We recommend to use cmake to build libraries and executables in tutorials. 
+However, if you prefer to use our simplified Makefiles, compile the libraries 
+using the Makefile in the root directory and then type in this directory:
+
+   make exe
+   make run-nod gs
+   make run-ana gs
+   make run-aud
+
+

@@ -1,0 +1,103 @@
+We have changed the list of input variables in version 3.0. 
+The critical changes are summarized below, see doc/user_guide.pdf
+for more detail.
+
+
+1. MESH FORMAT. 
+The list of arrays describing a mesh is now more intuitive. The 
+new or changed parameters are marked by a star
+    nv    - the number of points 
+    nvfix - the number of fixed points
+    vrt(2, nv) - the Cartesian coordinates of mesh points
+ *  labelV(nv) - point indentificator, a non-negative number
+    fixedV(nv) - a list of fixed points 
+
+    nb    - the number of boundary and interface edges 
+    nbfix - the number of fixed edges
+ *  bnd(2, nb) - connectivity list of boundary and interface edges
+ *  labelB(nb) - boundary edge identificator, a positive number
+    fixedB(nb) - a list of fixed edges
+
+    nc - the number of curved edges
+    Crv(2, nc) - parametrizations of curvilinear edges 
+                 column 1 - parameter for the starting point
+                 column 2 - parameter for the terminal point
+    labelC(nc) - zero or positive function number for computing 
+                 the Cartesian coordinates of points on mesh edges
+
+    nt    - the number of triangles (E)
+    ntfix - the number of fixed triangles
+    tri(3, nt) - connectivity list of triangles
+    labelT(nt) - triangle indentificator, a positive number
+    fixedT(nt) - list of fixed triangles
+
+
+2. PACKAGE AniMBA. 
+Many input parameters controlling mesh re-generation have been 
+collected in a single Integer array control(6). For example, a 
+new call of a mesh adaptation based on a nodal 'Metric' is
+
+      Call mbaNodal(nv, nvfix, nvmax, vrt, labelV, fixedV,       ! MESH
+     &              nb, nbfix, nbmax, IPF, labelB, fixedB,
+     &              nc,               Crv, labelC, CrvFunction,
+     &              nt, ntfix, ntmax, tri, labelT, fixedT,
+     &              nEStar, Quality, control, Metric,            ! CONTROL
+     &              MaxWr, MaxWi, rW, iW, iERR)                  ! WORK MEMORY
+
+The meaning of parameters is given in the following table, where 
+the left column shows the name of the same parameter in version 2.4:
+
+     MaxSkipE = control(1)       ! basket size 
+     MaxQItr  = control(2)       ! maximal number of local modifications 
+     status   = control(3)       ! advanced control of mesh generation
+     flagAuto = control(4).GT.0  ! recovery of missing objects
+     iPrint   = control(5)       ! verbosity level
+     iErrMesg = control(6)       ! NEW CONTROL
+
+We provide a simple routine to populate this array by default values
+  
+     Call populateControl(nt, control)
+
+
+3. PACKAGE AniFEM. 
+Removed internal contriduction between input and output parameters in
+
+      Call fem2Dtri(XY1, XY2, XY3,
+     &              OpA, FEMtypeA, OpB, FEMtypeB,
+     &              label, D, dDATA, iDATA, iSYS, order,   <--- here
+     &              LDA, A, ir, ic)
+
+The second argument in the second row (marked) correspond to the number
+of rows, ir, in the matrix A. It coresponded to the number of columns 
+in versrion 2.4.
+
+
+Many input parameters controlling matrix assembling have been 
+collected in a signle array control(3). It may grow with time.
+A new call for the assembling procudure is 
+
+      Call BilinearFormTemplate(
+     &     nv, nb, nt, vrt, labelV, bnd, labelB, tri, labelT,  ! MESH
+     &     FEM2Dext, dDATA, iDATA, control,                    ! USER INPUT
+     &     MaxF, MaxA, IA, JA, A, F, nRow, nCol,               ! MATRIX
+     &     MaxWi, MaxWr, iW, rW)                               ! WORK MEMORY
+
+The meaning of parameters is given in the following table, where 
+the left column shows the name of the same parameter in version 2.4:
+
+     assembleStatus = control(1)  ! information about matrix
+     iPrint         = control(2)  ! verbosity level
+     iErrMesg       = control(3)  ! NEW CONTROL
+
+
+Interface to user routines have been extended. We have added one 
+additional input array iDATA(). Now the user routine D is accessed 
+as follows:
+
+     Integer  D
+     External D
+     i = D(x, y, label, dDATA, iDATA, iSYS, Coef)
+
+In addition to the original real*8 array dDATA(), the user may pass
+an integer array iDATA() to his/her function D.
+

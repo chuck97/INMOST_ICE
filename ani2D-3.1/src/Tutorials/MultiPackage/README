@@ -1,0 +1,44 @@
+These subdirectories contain examples of adaptive computation showing 
+different features of the package:
+
+
+Interpolation/    is a simple example generating an adaptive mesh to 
+                  minimize the maximum error of P_1 intepolation
+
+IsotropicBVP/     is an example of solving an elliptic boundary value 
+                  problem (BVP) with isotropic singularity using an 
+                  adaptive mesh. The domain is a disk with a cut.
+
+NonisotropicBVP1/ is an example of solving an elliptic BVP with 
+                  anisotropic singularity and jumping coefficients 
+                  using an adaptive mesh. The domain is the disk without 
+                  one quadrant.
+
+NonisotropicBVP2/ is an example of solving an elliptic BVP with four
+                  boundary layers in a polygonal domain. The adaptive 
+                  mesh is anisotropic.
+
+ConvectionDiffusion/ is an example of the convection-diffusion equation
+
+HybridMixedFem/   is an example of hybrid mixed finite element 
+                  discretization of the Poisson equation
+
+Stokes/           is an example of mixed P2-P1 discretization of the 
+                  Stokes problem in a polygonal domain with a hole.
+
+StokesNavier/     is an example of mixed P2-P1 discretization of the 
+                  Navier-Stokes problem (lid driven cavity).
+
+UnsteadyConDif/   is an example of the FEM solution of the unsteady 
+                  convection-diffusion equation with SUPG stabilization
+
+PosterioriEstimates/ is an example of the  adaptive P_1 FEM solution 
+                  of the diffusion problem using edge-based a posteriori 
+                  error estimates.
+
+DiscontinuousGalerkin/ is an example of the adaptive DG solution of
+                  the Laplace equation using Hessian-based adaptation.
+
+
+
+For more details refer to READMEs in subdirectories.

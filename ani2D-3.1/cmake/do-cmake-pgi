@@ -1,0 +1,6 @@
+cmake  \
+  -DCMAKE_Fortran_COMPILER:FILEPATH=/opt/pgi/linux86-64/11.7/bin/pgf77 \
+  -DCMAKE_C_COMPILER:FILEPATH=/opt/pgi/linux86-64/11.7/bin/pgcc  \
+  -DCMAKE_CXX_COMPILER:FILEPATH=/opt/pgi/linux86-64/11.7/bin/pgCC  \
+  ../
+

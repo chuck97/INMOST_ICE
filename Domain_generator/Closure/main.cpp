@@ -8,7 +8,7 @@
 #include <tuple>
 
 const std::string RESOLUTION             = "crude";
-const double      DESIRED_TRIANGLE_SIZE  = 1000.0;  // in km
+const double      DESIRED_TRIANGLE_SIZE  = 50000.0;  // in km
 const double      EARTH_RADIUS           = 6371.0;  // in km
 const double      EXTREME_LATITUDE       = 45.0;    // extreme latitude while cropping
 const double      EXTREME_LATITUDE_OFFSET = 5.0;   // in degrees
@@ -116,4 +116,5 @@ int main()
     output << Rotate_Spherical(sph_rotated_pacific, rotation.Get_REVERSE()) << std::endl;
   }
   output << Rotate_Spherical(sph_east_first, rotation.Get_REVERSE()) << std::endl;
+  std::system("python ./plot_external.py");
 }

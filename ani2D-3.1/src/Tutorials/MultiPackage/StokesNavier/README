@@ -1,0 +1,42 @@
+*** Objectives ***
+
+The program demonstrates the iterative adaptive solution of the
+lid driven cavity boundary value problem:
+
+-div nu grad u  + (u.grad) u + grad p = 0   in Omega
+         div u                        = 0   in Omega
+
+                                    u = u_0 on dOmega_1
+                                    u = 0   on dOmega_2
+
+where Omega is the unit square, dOmega_1 is the side at y=1,
+and dOmega_2 is the rest of the boundary. The non-homogeneous
+boundary condition is
+
+   u_0 = { 1, 0 }.
+
+We use the P2 finite elements for the velocity u and P1 finite elements 
+for the pressure p, which are known to be stable. SUPG stabilization of
+the convective term is not used. The discretization 
+method results in a system of nonlinear algebraic equations with a 
+saddle point structure.
+
+
+*** Contents ***
+   main.f      - Main program with calls routines from the libraries
+
+   forlibfem.f - The user-prepared file for the library libfem2D (matrix 
+                 and right-hand side generators). It provides routines
+                 for computing the Stokes matrix, the nonlinear function 
+                 of Navier-Stokes residual  and the right-hand side.
+
+   forlibinb.f - The user-prepared file for the library libINB (solution of
+                 systems of nonlinear equations by Newton-Krylov method).
+                 It provides routines for calling preconditioners and evaluation of
+                 the nonlinear vector function.
+
+   forlibaft.f - The user-prepared file for the library libAFT (initial mesh generator)
+                 It provides the local mesh size function
+
+ 
+

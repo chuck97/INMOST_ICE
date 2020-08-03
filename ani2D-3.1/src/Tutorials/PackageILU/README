@@ -1,0 +1,18 @@
+Package name:  Ani2D-ILU.
+
+Documentation: doc/user_guide.pdf
+
+1. What is Ani2D-ILU?
+  The FORTRAN package Ani2D-ILU solves sparse linear systems with non-singular matrices.
+
+2. Quick Start
+
+   1. read documentation in doc/user_guide.pdf
+   2. cd src/aniILU; make lib 
+   3. cd ../Tutorials/PackageILU
+   4. make exe
+   5. make bcg-ilu0
+   6. make gmres-ilu0
+   7. make bcg-ilu2
+   8. make clean
+

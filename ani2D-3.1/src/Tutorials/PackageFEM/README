@@ -1,0 +1,48 @@
+Project name:   GENERATOR OF FEM SYSTEMS ON UNSTRUCTURED TRIANGULAR MESHES.
+
+Package name:  Ani2D-FEM.
+
+Documentation: doc/user_guide.pdf
+
+1. What is Ani2D-FEM ?
+  The Fortran package Ani2D-FEM generates finite element matrices on 
+unstructured triangular meshes. The package allows to build elemental
+matrices for variety of finite elements and bilinear forms. It allows
+to modify these matrices, assemble them, and impose boundary conditions.
+
+This directory presents three examples of using the libraty lib2Dfem.a 
+The first example (mainTriangle.f) shows how to build elemental matrices.
+The second example shows how to apply various boundary conditions.
+The third example (mainTemplate.f) shows how to assemble a matrix for the Stokes problems. 
+
+
+2. Quick Start
+
+   * build all libraries 'make lib'
+   * read documentation  'acroread user_guide.pdf'
+   * cd src/Tutorials/PackageFEM
+   * make exe
+   * make help 
+   * make run-triangle
+   * make run-bc
+   * less ../../../bin/CSRsystem
+   * make run-stokes gs
+   * more ../../../bin/CSRsystem
+   * make clean
+
+
+3. Example of output 'make run-triangle'
+Triangle with the following vertices:
+  1   0.100   0.200
+  2   0.000   1.000
+  3   1.000   1.000
+
+TEST 1: Bilinear form <BDM1, BDM1>
+Elemental matrix size:   6   6
+  0.226823E+00 -0.113375E+00 -0.455074E-01 -0.182812E+00 -0.503891E+00 -0.879810E+00
+ -0.113375E+00  0.276042E+00  0.313583E-01  0.327529E+00  0.500000E+00  0.109127E+01
+ -0.455074E-01  0.313583E-01  0.264323E+00 -0.394397E+00  0.752600E+00  0.317187E+00
+ -0.182812E+00  0.327529E+00 -0.394397E+00  0.377812E+01 -0.302335E+00  0.200233E+01
+ -0.503891E+00  0.500000E+00  0.752600E+00 -0.302335E+00  0.581250E+01  0.406404E+01
+ -0.879810E+00  0.109127E+01  0.317187E+00  0.200233E+01  0.406404E+01  0.842812E+01
+

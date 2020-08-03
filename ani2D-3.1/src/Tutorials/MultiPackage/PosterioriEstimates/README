@@ -1,0 +1,22 @@
+*** Objectives ***
+
+The program demonstrates the iterative adaptive solution of the
+boundary value problem:
+
+   -div K grad p = f    in  Omega   
+               p = g    on  dOmega
+
+where Omega is a bounded domain. We shall refer to p as the pressure. 
+We use the P_1 finite element method with edge-based a posteriori error 
+estimates.
+
+
+*** Contents ***
+   main.f      - Main program with calls routines from the libraries
+
+   forlibfem.f - The user-prepared file for the library libfem2D-2.x.a. 
+                 It provides routines for computing the diffusion tensor, 
+                 boundary conditions and the right-hand side. It also
+                 provides elemental matrices and right-hand sides for
+                 the a posteriori estimator.
+

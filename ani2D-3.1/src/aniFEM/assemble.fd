@@ -1,0 +1,19 @@
+C ======================================================================
+C               MATRIX DETAILs
+C ======================================================================
+      Integer   MATRIX_SYMMETRIC,     MATRIX_GENERAL
+      Parameter(MATRIX_SYMMETRIC = 1, MATRIX_GENERAL = 2)
+
+      Integer   FORMAT_AMG
+      Parameter(FORMAT_AMG = 4)
+
+      Integer   FORMAT_CSR,     FORMAT_CSC
+      Parameter(FORMAT_CSR = 8, FORMAT_CSC = 16)
+
+
+C ======================================================================
+C               COMMUNICATION ARRAYs
+C ======================================================================
+      Integer   MAXiSYS
+      Parameter(MAXiSYS = 15)
+

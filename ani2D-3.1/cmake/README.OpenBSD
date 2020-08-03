@@ -1,0 +1,9 @@
+OpenBSD 8.2 
+
+Additional required packages:
+
+gfortran - Fortran compilers, if none installed yet
+ghostscript-8.63p15 - GhostScript library 
+
+python-tkinter-2.6.x - TKinter library for python package AniPY
+py-Imaging-1.1.7p0-python2.6 - PIL library for python package AniPY

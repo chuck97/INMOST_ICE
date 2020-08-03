@@ -1,0 +1,6 @@
+cmake  \
+  -DCMAKE_Fortran_COMPILER:FILEPATH=/opt/oracle/solstudio12.2/bin/sunf90 \
+  -DCMAKE_C_COMPILER:FILEPATH=/opt/oracle/solstudio12.2/bin/suncc  \
+  -DCMAKE_CXX_COMPILER:FILEPATH=/opt/oracle/solstudio12.2/bin/sunCC \
+  ../
+
