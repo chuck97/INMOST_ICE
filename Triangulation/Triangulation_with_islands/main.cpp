@@ -11,10 +11,10 @@ extern "C"
 	#include "ani2d_routines.h"
 }
 
-const int    nvmax    = 1'000'000;
-const int    ntmax    = 2*nvmax;
-const int    nbmax    = 100'000;
-const double tr_size  = 0.2;
+static const int    nvmax    = 10'000'000;
+static const int    ntmax    = 2*nvmax;
+static const int    nbmax    = 1'000'000;
+static const double tr_size  = 0.2;
 
 template<typename ValueType>
 ValueType* allocate1d(size_t size)
@@ -65,72 +65,166 @@ ValueType* reshape_2d_2_1d(ValueType** array_2d, size_t nrows, size_t ncols)
 
 int main()
 {
-	std::string input_path = "../../Domain/data/arctic_crude_coarsened_external.txt";
-	std::ifstream input(input_path);
+	std::string input_external_path = "../../Domain/data/arctic_crude_coarsened_external.txt";
+	std::string input_islands_path = "../../Domain/data/arctic_crude_coarsened_islands.txt";
+	std::ifstream input_external(input_external_path);
+	std::ifstream input_islands(input_islands_path);
 	
 	std::string line;
-	std::vector<std::pair<double, double>> points;
+	std::vector<std::pair<double, double>> points_external;
+	std::vector<std::vector<std::pair<double, double>>> points_islands;
+	
+	
+	//READ EXTERNAL BOUNDARY
 	
 	//skip first line
-	getline(input, line);
+	getline(input_external, line);
 	
-	while(getline(input, line))
+	while(getline(input_external, line))
 	{
 		std::stringstream ss(line);
 		double first, second;
 		ss >> first >> second;
-		points.push_back({first, second});
+		points_external.push_back({first, second});
 	}
 	
 	//remove last point (it is the same as first)
-	points.pop_back();
+	points_external.pop_back();
 	
-	int Nbv = points.size();
+	//READ ISLANDS
+	
+	int total_island_points = 0;
+	std::vector<std::pair<double, double>> current_island;
+	
+	//skip first line
+	getline(input_islands, line);
+	
+	while(getline(input_islands, line))
+	{
+		if (line[0] == '#')
+		{
+			current_island.pop_back();
+			total_island_points += current_island.size();
+			points_islands.push_back(current_island);
+			current_island.clear();
+		}
+		else
+		{
+			std::stringstream ss(line);
+			double first, second;
+			ss >> first >> second;
+			current_island.push_back({first, second});
+		}
+	}
+	
+	current_island.pop_back();
+	total_island_points += current_island.size();
+	points_islands.push_back(current_island);
+	current_island.clear();
+	
+	// Make input for AFT routine
+	
+	int Nbv = points_external.size() + total_island_points;
 	int Nbl = Nbv;
 	
 	std::cout << "boundary verticies: " << Nbv << std::endl;
 	std::cout << "boundary edges: " << Nbl << std::endl;
 	
+	
 	double**     bv2d = allocate2d<double>(Nbv, 2);
-	int**        bl2d = allocate2d<int>(Nbv, 7);
-	double** bltail2d = allocate2d<double>(Nbv, 2);
+	int**        bl2d = allocate2d<int>(Nbl, 7);
+	double** bltail2d = allocate2d<double>(Nbl, 2);
 	
 	// fill bv and bl
-	for (size_t i = 0; i < points.size()-1; ++i)
+	size_t k = 0;  // global index
+	
+	// external points
+	
+	for (size_t i = 0; i < points_external.size()-1; ++i)
 	{
-		std::pair<double, double> p = points[i];
-		bv2d[i][0]  = p.first;
-		bv2d[i][1]  = p.second;
+		std::pair<double, double> p = points_external[i];
+		bv2d[k][0]  = p.first;
+		bv2d[k][1]  = p.second;
 
- 		bl2d[i][0]  = i+1;
- 		bl2d[i][1]  = i+2;
- 		bl2d[i][2]  = 0;
- 		bl2d[i][3]  = -1;
- 		bl2d[i][4]  =  i+1;
- 		bl2d[i][5]  =  1;
- 		bl2d[i][6]  =  0;
+ 		bl2d[k][0]  = k+1;
+ 		bl2d[k][1]  = k+2;
+ 		bl2d[k][2]  = 0;
+ 		bl2d[k][3]  = -1;
+ 		bl2d[k][4]  =  k+1;
+ 		bl2d[k][5]  =  1;
+ 		bl2d[k][6]  =  0;
  
-		bltail2d[i][0] = 0.0;
-		bltail2d[i][1] = 0.0;
+		bltail2d[k][0] = 0.0;
+		bltail2d[k][1] = 0.0;
+		++k;
 	}
+	
 	//last point is special
-	bv2d[Nbv-1][0] = points[Nbv-1].first;
-	bv2d[Nbv-1][1] = points[Nbv-1].second;
+	bv2d[k][0] = points_external.back().first;
+	bv2d[k][1] = points_external.back().second;
 	
-	bl2d[Nbv-1][0] = Nbv;
-	bl2d[Nbv-1][1] = 1;
-	bl2d[Nbv-1][2] = 0;
-	bl2d[Nbv-1][3] = -1;
-	bl2d[Nbv-1][4] = Nbv;
-	bl2d[Nbv-1][5] = 1;
-	bl2d[Nbv-1][6] = 0;
 	
-	bltail2d[Nbv-1][0] = 0.0;
-	bltail2d[Nbv-1][1] = 0.0;
+	bl2d[k][0] = k+1;
+	bl2d[k][1] = 1;
+	bl2d[k][2] = 0;
+	bl2d[k][3] = -1;
+	bl2d[k][4] = k+1;
+	bl2d[k][5] = 1;
+	bl2d[k][6] = 0;
 	
+	bltail2d[k][0] = 0.0;
+	bltail2d[k][1] = 0.0;
+	
+	++k;
+	
+	// islands
+	
+	for (size_t i = 0; i < points_islands.size(); ++i)
+	{
+		size_t first_point_global_num = k;
+		std::vector<std::pair<double, double>> cuurent_island = points_islands[i];
+		
+		for (size_t j = 0; j < points_islands[i].size()-1; ++j)
+		{
+			std::pair<double, double> p = cuurent_island[j];
+			bv2d[k][0]  = p.first;
+			bv2d[k][1]  = p.second;
+	
+			bl2d[k][0]  = k+1;
+			bl2d[k][1]  = k+2;
+			bl2d[k][2]  = 0;
+			bl2d[k][3]  = -1;
+			bl2d[k][4]  = k+1;
+			bl2d[k][5]  = 1;
+			bl2d[k][6]  = 0;
+	
+			bltail2d[k][0] = 0.0;
+			bltail2d[k][1] = 0.0;
+			++k;
+		}
+		//last point is special
+		bv2d[k][0] = cuurent_island.back().first;
+		bv2d[k][1] = cuurent_island.back().second;
+		
+		bl2d[k][0] = k+1;
+		bl2d[k][1] = first_point_global_num+1;
+		bl2d[k][2] = 0;
+		bl2d[k][3] = -1;
+		bl2d[k][4] = k+1;
+		bl2d[k][5] = 1;
+		bl2d[k][6] = 0;
+		
+		bltail2d[k][0] = 0.0;
+		bltail2d[k][1] = 0.0;
+		
+		++k;
+	}
+	
+	// reshape input
 	double*     bv = reshape_2d_2_1d<double>(bv2d, Nbv, 2);
-	int*        bl = reshape_2d_2_1d<int>(bl2d, Nbv, 7);
-	double* bltail = reshape_2d_2_1d<double>(bltail2d, Nbv, 2);
+	int*        bl = reshape_2d_2_1d<int>(bl2d, Nbl, 7);
+	double* bltail = reshape_2d_2_1d<double>(bltail2d, Nbl, 2);
+		
 	 
 	//output data
 	int nv, nt, nb, nc;
@@ -190,7 +284,7 @@ int main()
 		std::terminate();
 	}
 	
-	char output_ps[100] = "no_islands.ps";
+	char output_ps[100] = "full.ps";
 	
 	//visualization
 	graph_(&nv, vrt, &nt, tri, output_ps);
