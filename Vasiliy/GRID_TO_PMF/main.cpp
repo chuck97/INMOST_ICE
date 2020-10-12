@@ -6,14 +6,7 @@
 #include <map>
 #include "inmost.h"
 
-#define USE_MPI
-#define USE_PARTITIONER
 using namespace INMOST;
-#if defined(USE_MPI)
-#define BARRIER MPI_Barrier(MPI_COMM_WORLD);
-#else
-#define BARRIER
-#endif
 
 #define M_Assert(Expr, Msg) \
     if (!Expr)  \
@@ -31,6 +24,8 @@ int main(int argc, char **argv)
     Mesh::Initialize(&argc, &argv);
     Partitioner::Initialize(&argc, &argv);
 
+    int nv,nt,nf;
+
     Mesh *m;
     m = new Mesh();
     const char * name_vrt = "/data90t/geosci/spetrov/INMOST_ICE/Triangulation/Triangulation_thickening/triangulation_output/vrt.txt";
@@ -44,14 +39,14 @@ int main(int argc, char **argv)
     Tag Bnd_id = m->CreateTag("Bnd_id", DATA_INTEGER, FACE, FACE, 1);
     Tag Is_node_bnd = m->CreateTag("Is_node_bnd", DATA_INTEGER, NODE, NODE, 1);
 
-    std::cout << "Start to read mesh!" <<std::endl;
+    std::cout << "Start to read mesh!" << std::endl;
 
     // Read verticies
     file.open(name_vrt);
     M_Assert((file.is_open()), "can not open vrt file");
 
     std::string tmp_STR;
-    int nv,nt,nf;
+
     file >> tmp_STR;
     file >> tmp_STR;
     file >> tmp_STR;
@@ -63,14 +58,14 @@ int main(int argc, char **argv)
     {
         Storage::real xyz[3];
 
-        file>>xyz[0];
-        file>>xyz[1];
+        file >> xyz[0];
+        file >> xyz[1];
         xyz[2] = 0.0;
 
-        Node nod = m->CreateNode(xyz);
-        nod->Integer(Node_id) = i+1;
-        nod->Integer(Label_tag) = 1;
-        nod->Integer(Is_node_bnd) = 0;
+        Node nod = m -> CreateNode(xyz);
+        nod -> Integer(Node_id) = i+1;
+        nod -> Integer(Label_tag) = 1;
+        nod -> Integer(Is_node_bnd) = 0;
         newverts.push_back(nod);
     }
     file.close();

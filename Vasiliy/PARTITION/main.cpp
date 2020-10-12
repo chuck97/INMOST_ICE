@@ -5,8 +5,10 @@
 #include <cmath>
 #include <map>
 #include "inmost.h"
+
 #define USE_MPI
 #define USE_PARTITIONER
+#define USE_PARTITIONER_PARMETIS
 
 using namespace INMOST;
 
@@ -45,21 +47,25 @@ int main(int argc, char **argv)
     m -> SetCommunicator(INMOST_MPI_COMM_WORLD);
 #endif
 
-    std::string MeshName = "/data90t/geosci/spetrov/INMOST_ICE/Vasiliy/ICE_1/build/test.pmf";
+    std::string MeshName = "/data90t/geosci/spetrov/INMOST_TESTS/GRID_TO_PMF/grid_data";
     ttt = Timer();
 
     if(m -> isParallelFileFormat(MeshName))
     {
-        m -> Load(MeshName); // Load mesh from the serial file format
+        m -> Load(MeshName); 
         repartition = true;
-        std::cout << "parallel" << std::endl;
+
+        if (m -> GetProcessorRank() == 0)
+        {
+            std::cout << "Parallel realization" << std::endl;
+        }
     }
     else
     {
         if (m -> GetProcessorRank() == 0)
         {
             m -> Load(MeshName);
-            std::cout << "serial" << std::endl;
+            std::cout << "Serial realization" << std::endl;
         }
     }
 
@@ -74,12 +80,12 @@ int main(int argc, char **argv)
 
     
 #if defined(USE_PARTITIONER)
-	if (m->GetProcessorsNumber() > 1) // need repartition
+	if (m -> GetProcessorsNumber() > 1) // need repartition
 	{ 
         ttt = Timer();
-	    Partitioner * p = new Partitioner(m);
+	    Partitioner* p = new Partitioner(m);
 #ifdef USE_PARTITIONER_PARMETIS
-        p -> SetMethod(Partitioner::Parmetis, Partitioner::Repartition);
+        p -> SetMethod(Partitioner::Parmetis, Partitioner::Partition);
 #elif USE_PARTITIONER_ZOLTAN
         p -> SetMethod(Partitioner::Zoltan, Partitioner::Partition);
 #else
@@ -90,20 +96,21 @@ int main(int argc, char **argv)
         owner_process = m -> RedistributeTag();
 		BARRIER
 
-		if( m->GetProcessorRank() == 0 )
+	    if( m -> GetProcessorRank() == 0 )
         {
             std::cout << "Evaluate: " << Timer()-ttt << std::endl;
         } 
 
+        BARRIER
 		ttt = Timer();
 		m -> Redistribute(); // Redistribute the mesh data
 		m -> ReorderEmpty(CELL|FACE|EDGE|NODE); // Clean the data after reordring
         m -> ExchangeGhost(1, NODE);
 		BARRIER
 
-		if( m->GetProcessorRank() == 0 )
+		if( m -> GetProcessorRank() == 0 )
         {
-            std::cout << "Redistribute: " << Timer()-ttt << std::endl;
+        	std::cout << "Redistribute: " << Timer()-ttt << std::endl;
         } 
 	}
 #endif
@@ -118,7 +125,7 @@ int main(int argc, char **argv)
 	id = m -> GlobalIDTag(); // Get the tag of the global ID
 
     ttt = Timer();
-	m->Save("test.pvtk");
+	m -> Save("test.pvtk");
 	BARRIER
 
 	if( m->GetProcessorRank() == 0 )
