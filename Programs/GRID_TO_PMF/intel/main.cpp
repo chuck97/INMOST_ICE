@@ -33,10 +33,6 @@ int main(int argc, char **argv)
     const char * name_tri = "/data90t/geosci/spetrov/INMOST_ICE/Triangulation/Triangulation_thickening/triangulation_output/tri.txt";
     std::ifstream file;
 
-    Tag Label_tag = m->CreateTag("LabelTag", DATA_INTEGER, CELL | FACE | EDGE | NODE, NONE, 1);
-    Tag Node_id = m->CreateTag("Node_id", DATA_INTEGER, NODE, NONE, 1);
-    Tag Tri_id = m->CreateTag("Tri_id", DATA_INTEGER, CELL, NONE, 1);
-    Tag Bnd_id = m->CreateTag("Bnd_id", DATA_INTEGER, FACE, FACE, 1);
     Tag Is_node_bnd = m->CreateTag("Is_node_bnd", DATA_INTEGER, NODE, NODE, 1);
 
     std::cout << "Start to read mesh!" << std::endl;
@@ -63,8 +59,6 @@ int main(int argc, char **argv)
         xyz[2] = 0.0;
 
         Node nod = m -> CreateNode(xyz);
-        nod -> Integer(Node_id) = i+1;
-        nod -> Integer(Label_tag) = 1;
         nod -> Integer(Is_node_bnd) = 0;
         newverts.push_back(nod);
     }
@@ -93,9 +87,6 @@ int main(int argc, char **argv)
 
         std::pair<Cell, bool> pair = m -> CreateCell(verts, ne_face_nodes, ne_num_nodes, 3);
 
-        pair.first.Integer(Tri_id) = i+1;
-
-        pair.first.Integer(Label_tag) = 1;
     }
     file.close();
 
@@ -121,7 +112,6 @@ int main(int argc, char **argv)
 
         std::pair<Face, bool> pair = m -> CreateFace(verts);
         M_Assert((!pair.second), "we didn't find face!!!");
-        pair.first.Integer(Bnd_id) = i+1;
     }
     ////////////////////////////////////// load and repartition mesh //////////////////////////
     m->Save("test.pmf");

@@ -37,7 +37,6 @@ int main(int argc, char **argv)
 #endif
 
     double ttt = Timer();
-    Tag id, owner_process;
 
     bool repartition = false;
     Mesh* m;
@@ -78,6 +77,18 @@ int main(int argc, char **argv)
         std::cout << "Processors: " << m -> GetProcessorsNumber() << std::endl;
     }
 
+    Tag local_node_id = m->CreateTag("local_node_id", DATA_INTEGER, NODE, NONE, 1);
+    Tag global_node_id = m->CreateTag("global_node_id", DATA_INTEGER, NODE, NONE, 1);
+
+    Tag local_tr_id = m->CreateTag("local_tr_id", DATA_INTEGER, CELL, NONE, 1);
+    Tag global_tr_id = m->CreateTag("global_tr_id", DATA_INTEGER, CELL, NONE, 1);
+
+    Tag local_bnd_id = m->CreateTag("local_bnd_id", DATA_INTEGER, FACE, FACE, 1);
+    Tag global_bnd_id = m->CreateTag("global_bnd_id", DATA_INTEGER, FACE, FACE, 1);
+
+    Tag node_owner_process = m->CreateTag("node_owner_process", DATA_INTEGER, NODE, NONE, 1); 
+    Tag tr_owner_process = m->CreateTag("tr_owner_process", DATA_INTEGER, CELL, NONE, 1);  
+    Tag bnd_owner_process = m->CreateTag("bnd_owner_process", DATA_INTEGER, FACE, FACE, 1); 
     
 #if defined(USE_PARTITIONER)
 	if (m -> GetProcessorsNumber() > 1) // need repartition
@@ -93,7 +104,6 @@ int main(int argc, char **argv)
 #endif
 		p -> Evaluate(); // Compute the partitioner and store new processor ID in the mesh
 		delete p;
-        owner_process = m -> RedistributeTag();
 		BARRIER
 
 	    if( m -> GetProcessorRank() == 0 )
@@ -112,17 +122,43 @@ int main(int argc, char **argv)
         {
         	std::cout << "Redistribute: " << Timer()-ttt << std::endl;
         } 
+        BARRIER
 	}
 #endif
 
     ttt = Timer();
-	m -> AssignGlobalID(CELL | EDGE | FACE | NODE);
-	BARRIER
+    //assigning global id
+	m -> AssignGlobalID(CELL|EDGE|FACE|NODE);
+    
+    //assigning local id
+    int i = 0;
+    for (Mesh::iteratorNode it = m->BeginNode(); it != m->EndNode(); it++)
+    {
+        it->Integer(local_node_id) = it->LocalID(); 
+        it->Integer(global_node_id) = it->GlobalID();
+        it->Integer(node_owner_process) = m->GetProcessorRank();
+    }
+
+    for (Mesh::iteratorCell it = m->BeginCell(); it != m->EndCell(); it++)
+    {
+        it->Integer(local_tr_id) = it->LocalID(); 
+        it->Integer(global_tr_id) = it->GlobalID();
+        it->Integer(tr_owner_process) = m->GetProcessorRank();
+    }
+
+    for (Mesh::iteratorFace it = m->BeginFace(); it != m->EndFace(); it++)
+    {
+        it->Integer(local_bnd_id) = it->LocalID(); 
+        it->Integer(global_bnd_id) = it->GlobalID();
+        it->Integer(bnd_owner_process) = m->GetProcessorRank();
+    }
+
+    BARRIER
 	if( m -> GetProcessorRank() == 0 )
     {
-        std::cout << "Assign id: " << Timer()-ttt << std::endl;
+        std::cout << "Assign ids: " << Timer()-ttt << std::endl;
     } 
-	id = m -> GlobalIDTag(); // Get the tag of the global ID
+
 
     ttt = Timer();
 	m -> Save("test.pvtk");
