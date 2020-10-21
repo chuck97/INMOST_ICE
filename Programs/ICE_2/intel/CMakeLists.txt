@@ -1,25 +1,20 @@
 cmake_minimum_required(VERSION 2.6)
 project(dummy_solver)
 enable_language (CXX C)
-set(CMAKE_CXX_COMPILER mpicxx)
-set(CMAKE_C_COMPILER mpicc)
+set(CMAKE_CXX_COMPILER mpiicpc)
+set(CMAKE_C_COMPILER mpiicc)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_BUILD_TYPE DEBUG)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0  -g")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0  -g")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O0  -g")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0  -g")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0  -g")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O0  -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -gcc-name=gcc-4.8 -O0  -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gxx-name=g++-4.8 -O0  -g")
 
 
 set(INMOST_SRC "/data90t/geosci/spetrov/INMOST_BUILD/INMOST-0.1")
-set(INMOST_BUILD "/data90t/geosci/spetrov/INMOST_BUILD/INMOST-gnu-build-h1")
-set(PETSC_DIR "/data90t/geosci/spetrov/INMOST_BUILD/INMOST-gnu-build-h1/petsc-3.5.2")
-set(PETSC_ARCH "arch-linux2-c-debug")
+set(INMOST_BUILD "/data90t/geosci/spetrov/INMOST_BUILD/INMOST-intel-build")
+set(PETSC_DIR "/data90t/geosci/spetrov/INMOST_BUILD/INMOST-intel-build/petsc-3.5.2")
+set(PETSC_ARCH "linux-intel-release")
 
 
 include_directories(${INMOST_SRC}/Source/Headers)

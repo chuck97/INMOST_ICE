@@ -15,7 +15,7 @@ using namespace INMOST;
 #endif
 
 
-
+#define USE_PARTITIONER_PARMETIS
 
 
 int main(int argc, char **argv) 
@@ -203,7 +203,12 @@ int main(int argc, char **argv)
 
     min_index = tmp_var;
     max_index = -1;
-    std::cout<<"num nodes "<<mesh_main->TotalNumberOf(NODE);
+    long int tot_nodes = mesh_main->TotalNumberOf(NODE);
+    if (processRank == 0)
+    {
+        std::cout<<"num nodes " << tot_nodes;
+    }
+
     for (Mesh::iteratorNode it = mesh_main->BeginNode(); it != mesh_main->EndNode(); it++) 
     {
         tmp_var = it->GlobalID();
@@ -220,7 +225,34 @@ int main(int argc, char **argv)
             }
         }
     }
-    std::cout<<"min_index "<<min_index<<" max_index "<<max_index<<std::endl;
+
+    std::cout<<processRank << ": min_index "<<min_index<<" max_index "<<max_index<<std::endl;
+
+    double min_x = mesh_main->BeginNode()->Coords()[0];
+    double max_x = mesh_main->BeginNode()->Coords()[1];
+    double min_y = mesh_main->BeginNode()->Coords()[0];
+    double max_y = mesh_main->BeginNode()->Coords()[1];
+    for (Mesh::iteratorNode it = mesh_main->BeginNode(); it != mesh_main->EndNode(); it++) 
+    {
+        if (it->Coords()[0] < min_x)
+        {
+            min_x = it->Coords()[0];
+        }
+        if (it->Coords()[0] > max_x)
+        {
+            max_x = it->Coords()[0];
+        }
+        if (it->Coords()[1] < min_y)
+        {
+            min_y = it->Coords()[1];
+        }
+        if (it->Coords()[1] > max_y)
+        {
+            max_y = it->Coords()[1];
+        }
+    }
+    std::cout << processRank << ": min_x = " << min_x << " max_x = " << max_x << "; min_y = " << min_y << " max_y = " << max_y << std::endl; 
+    BARRIER
     Tag Sol_tag = mesh_main->CreateTag("U", DATA_REAL, NODE, NONE, 1);
 
     double DeltaT = 1;
@@ -240,29 +272,7 @@ int main(int argc, char **argv)
         b.SetInterval(min_index, max_index + 1);
         mat.SetInterval(min_index, max_index + 1);
 
-        for (Mesh::iteratorNode it = mesh_main->BeginNode(); it != mesh_main->EndNode(); it++) 
-        {
-            if (it->GetStatus() != Element::Ghost) 
-            {
-                ElementArray<Cell> cells = it->getCells();
-                for(i=0;i<cells.size();i++)
-                {
-                    ElementArray<Node> nodes = cells[i].getNodes();
-                    for(j=0;j<nodes.size();j++){
-                        if(it->GlobalID() != nodes[j].GlobalID())
-                        {
-                            //calc something
-                        }
-                        else
-                        {
-
-                        }
-                    }
-                }
-                mat[it->GlobalID()][it->GlobalID()]=1.0;
-                b[it->GlobalID()]=0.0;
-            }
-        }
+        
         Itime++;
         solv.SetMatrix(mat);
 
