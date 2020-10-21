@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     m -> SetCommunicator(INMOST_MPI_COMM_WORLD);
 #endif
 
-    std::string MeshName = "/data90t/geosci/spetrov/INMOST_TESTS/GRID_TO_PMF/grid_data/test.pmf";
+    std::string MeshName = "/data90t/geosci/spetrov/INMOST_TESTS/GRID_TO_PMF/test.pmf";
     ttt = Timer();
 
     if(m -> isParallelFileFormat(MeshName))

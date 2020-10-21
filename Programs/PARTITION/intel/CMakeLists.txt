@@ -47,6 +47,5 @@ target_link_libraries(${EXEC_NAME} ${PETSC_DIR}/${PETSC_ARCH}/lib/libf2clapack.a
 target_link_libraries(${EXEC_NAME} ${PETSC_DIR}/${PETSC_ARCH}/lib/libf2cblas.a)
 target_link_libraries(${EXEC_NAME} -ldl)
 target_link_libraries(${EXEC_NAME} -lgfortran)
-target_link_libraries(${EXEC_NAME} -lX11)
 target_link_libraries(${EXEC_NAME} -lssl)
 target_link_libraries(${EXEC_NAME} -lcrypto)

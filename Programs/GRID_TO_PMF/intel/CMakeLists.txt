@@ -8,10 +8,16 @@ set(CMAKE_C_COMPILER mpiicc)
 
 set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} -gcc-name=gcc-4.8)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -gxx-name=g++-4.8)
 
+
+set(CMAKE_CXX_STANDARD 11)
+
+set(INMOST_BUILD_ARCH "INMOST-intel-build")
 set(INMOST_SRC "/data90t/geosci/spetrov/INMOST_BUILD/INMOST-0.1")
-set(INMOST_BUILD "/data90t/geosci/spetrov/INMOST_BUILD/INMOST-intel-build")
-set(PETSC_DIR "/data90t/geosci/spetrov/INMOST_BUILD/petsc-3.5.2")
+set(INMOST_BUILD "/data90t/geosci/spetrov/INMOST_BUILD/${INMOST_BUILD_ARCH}")
+set(PETSC_DIR "/data90t/geosci/spetrov/INMOST_BUILD/${INMOST_BUILD_ARCH}/petsc-3.5.2")
 set(PETSC_ARCH "linux-intel-debug")
 
 
