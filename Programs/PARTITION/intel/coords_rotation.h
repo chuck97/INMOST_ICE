@@ -451,6 +451,7 @@ std::vector<RealType> from_model_2_geo(RealType model_lon, RealType model_lat)
   return {lon, lat};
 }
 
+
 template<typename RealType>
 std::vector<RealType> from_geo_2_model(RealType lon, RealType lat)
 {
@@ -465,6 +466,49 @@ std::vector<RealType> from_geo_2_model(RealType lon, RealType lat)
   return {model_lon, model_lat};
 }
 
+
+template<typename RealType>
+std::vector<RealType> from_geo_2_model_vec(RealType geo_vec_lon, RealType geo_vec_lat,
+                                           RealType geo_lon, RealType geo_lat)
+{
+  std::vector<RealType> m = from_geo_2_model(geo_lon, geo_lat);
+  RealType LON_MOD = m[0];
+  RealType LAT_MOD = m[1];
+
+  RealType X_GEO, Y_GEO, Z_GEO;
+  RealType radian = M_PI/180.0;
+  Euler_rotation_info<RealType> rotation(ALPHA_DEF, BETA_DEF, GAMMA_DEF);
+
+  //convert geogr. long/lat into geogr. cartesian
+  X_GEO = -geo_vec_lon*sin(geo_lon*radian) -
+  geo_vec_lat*cos(geo_lon*radian)*sin(geo_lat*radian);
+
+  Y_GEO = geo_vec_lon*cos(geo_lon*radian) -
+  geo_vec_lat*sin(geo_lon*radian)*sin(geo_lat*radian);
+ 
+  Z_GEO = geo_vec_lat*cos(geo_lat*radian);
+
+  //rotate geogr. cartesian into model cartesian
+  Cartesian_Coords<RealType> c(X_GEO, Y_GEO, Z_GEO);
+  Cartesian_Coords<RealType> rc = Rotate_Cartesian<RealType>(c, rotation.Get_REVERSE());
+  
+  
+  double FIELD_X, FIELD_Y;
+  double X_MOD = rc.Get_x();
+  double Y_MOD = rc.Get_y();
+  double Z_MOD = rc.Get_z();
+
+  //convert model cartesian into model long/lat
+  FIELD_X = - X_MOD*sin(LON_MOD*radian)
+            + Y_MOD*cos(LON_MOD*radian);
+            
+  FIELD_Y = - X_MOD*cos(LON_MOD*radian)*sin(LAT_MOD*radian)
+            - Y_MOD*sin(LON_MOD*radian)*sin(LAT_MOD*radian)
+            + Z_MOD*cos(LAT_MOD*radian);
+
+  return {FIELD_X, FIELD_Y};
+}
+
 std::vector<double> from_geo_2_topaz(double lon, double lat)
 {
   projPJ pj_longlat, pj_topaz;
@@ -472,17 +516,17 @@ std::vector<double> from_geo_2_topaz(double lon, double lat)
 
   if (!(pj_longlat = pj_init_plus("+proj=longlat +ellps=clrk66")) )
   {
-    ERR("error pj_longlat");
+    INMOST_ICE_ERR("error pj_longlat");
   }
 
   if (!(pj_topaz = pj_init_plus("+units=m +proj=stere +a=6378273.0 +b=6378273.0 +lon_0=-45.0 +lat_0=90.0 +lat_ts=90.0")) )
   {
-    ERR("error pj_topaz");
+    INMOST_ICE_ERR("error pj_topaz");
   }
    
   double lon_rad = lon*DEG_TO_RAD;
   double lat_rad = lat*DEG_TO_RAD; 
-  
+
   p = pj_transform(pj_longlat, pj_topaz, 1, 1, &lon_rad, &lat_rad, NULL);
   
   pj_free(pj_longlat);
@@ -498,12 +542,12 @@ std::vector<double> from_topaz_2_geo(double x, double y)
 
   if (!(pj_longlat = pj_init_plus("+proj=longlat +ellps=clrk66")) )
   {
-    ERR("error pj_longlat");
+    INMOST_ICE_ERR("error pj_longlat");
   }
 
   if (!(pj_topaz = pj_init_plus("+units=m +proj=stere +a=6378273.0 +b=6378273.0 +lon_0=-45.0 +lat_0=90.0 +lat_ts=90.0")) )
   {
-    ERR("error pj_topaz");
+    INMOST_ICE_ERR("error pj_topaz");
   }
    
   p = pj_transform(pj_topaz, pj_longlat, 1, 1, &x, &y, NULL);
@@ -513,5 +557,6 @@ std::vector<double> from_topaz_2_geo(double x, double y)
 
   return {x*RAD_TO_DEG, y*RAD_TO_DEG};  
 }
+
 
 

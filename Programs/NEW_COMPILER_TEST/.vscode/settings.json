@@ -7,7 +7,6 @@
         "cstddef": "cpp",
         "cstdio": "cpp",
         "cstdlib": "cpp",
-        "ctime": "cpp",
         "cwchar": "cpp",
         "cwctype": "cpp",
         "array": "cpp",
@@ -21,7 +20,6 @@
         "fstream": "cpp",
         "functional": "cpp",
         "initializer_list": "cpp",
-        "iomanip": "cpp",
         "iosfwd": "cpp",
         "iostream": "cpp",
         "istream": "cpp",
@@ -37,19 +35,15 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "typeinfo": "cpp",
+        "any": "cpp",
         "algorithm": "cpp",
         "iterator": "cpp",
-        "map": "cpp",
         "memory": "cpp",
         "memory_resource": "cpp",
         "optional": "cpp",
         "random": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "bit": "cpp",
-        "thread": "cpp",
-        "cstring": "cpp",
-        "chrono": "cpp",
-        "ratio": "cpp"
+        "bit": "cpp"
     }
 }

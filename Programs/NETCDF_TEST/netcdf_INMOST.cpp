@@ -786,7 +786,6 @@ void Dataset::ReadVars(size_t time_step)
         {
             throw std::invalid_argument("can't parce netcdf - unknown variables structure. Currently possible: (x), (y), (t), (y,x), (t,y,x).");
         }
-        
     }
 }
 

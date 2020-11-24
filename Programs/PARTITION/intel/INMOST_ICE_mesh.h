@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "INMOST_ICE_mesh.h"
 
 static inline void ltrim(std::string &s);
 static inline void rtrim(std::string &s);
@@ -31,13 +32,44 @@ class INMOST_ICE_nodes
 public:
     INMOST_ICE_nodes(INMOST::Mesh* m);
     INMOST::Mesh* GetMesh();
-    void FindExtrCoords();
-    NodeCoords& GetCoords();
-    void ReadNodeData();                                    
+    NodeCoords& GetCoords();     
+    void InterpolateScalarFromNETCDF(const std::string& filename,
+                                     const std::string& xname,
+                                     const std::string& yname,
+                                     int netcdf_time_step,
+                                     const std::string& node_variable_name,
+                                     const std::string& scale_factor_name,
+                                     const std::string& invalid_value_name,
+                                     const std::string& offset_name,
+                                     double invalid_value_fill,
+                                     double no_extrapolation_fill,
+                                     const std::string& nc_variable_name,
+                                     double max_abs_value,
+                                     bool is_depth,
+                                     INMOST::Tag netcdf_coords
+                                     );
+
+    void InterpolateVectorFromNETCDF(const std::string& filename,
+                                     const std::string& xname,
+                                     const std::string& yname,
+                                     const std::string& lonname,
+                                     const std::string& latname,
+                                     int netcdf_time_step,
+                                     const std::string& node_variable_name,
+                                     const std::string& scale_factor_name,
+                                     const std::string& invalid_value_name,
+                                     const std::string& offset_name,
+                                     double invalid_value_fill,
+                                     double no_extrapolation_fill,
+                                     const std::string& nc_variable_name1,
+                                     const std::string& nc_variable_name2,
+                                     double max_abs_value,
+                                     bool is_depth,
+                                     INMOST::Tag netcdf_coords
+                                     );
 private:
+    std::map<std::string, INMOST::Tag> node_data_tags;
     INMOST::Mesh* ice_mesh;
     NodeCoords nc;
     INMOST::Tag a;
-public:
-    double min_topaz_x, max_topaz_x, min_topaz_y, max_topaz_y;
 };

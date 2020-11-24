@@ -73,6 +73,13 @@ public:
     virtual void VarInfo() const
     {
     }
+
+    virtual std::any Get_array1D() const
+    {};
+
+    virtual std::any Get_array2D() const
+    {};
+
 protected:
     const int id;
     const std::string name;
@@ -131,6 +138,16 @@ public:
                   << "2d_size = "  << x_size << "x" << y_size
                   << std::endl;
     }
+    
+    std::any Get_array1D() const
+    {
+        return array1D;
+    }
+
+    std::any Get_array2D() const
+    {
+        return array1D;
+    }
 
 private:
     const nc_type type;
@@ -159,4 +176,5 @@ private:
     std::vector<Dim> dims;
     std::vector<std::shared_ptr<anyAtt>> atts;
     std::vector<std::shared_ptr<anyVar>> vars;
+    std::vector<std::shared_ptr<anyVar>> coords;
 };
