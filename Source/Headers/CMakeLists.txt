@@ -1,6 +1,10 @@
 set(
 	HEADER
         ${HEADER}
-        ${CMAKE_CURRENT_SOURCE_DIR}/hello_world.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/config.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/coords_rotation.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/interpolators.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/mesh.h
+	${CMAKE_CURRENT_SOURCE_DIR}/inmost_ice.h
         PARENT_SCOPE
 )

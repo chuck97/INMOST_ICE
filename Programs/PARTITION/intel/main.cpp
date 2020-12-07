@@ -18,14 +18,14 @@ int main(int argc, char **argv)
 
     // Interpolate a ice
     ttt = Timer();
-    n.InterpolateScalarFromNETCDF(TOPAZ_NC_FILENAME,
+    n.TopazScalarInterpolation(TOPAZ_NC_FILENAME,
                                   X_NAME_TOPAZ,
                                   Y_NAME_TOPAZ,
                                   0,
                                   "a",
-                                  SCALE_FACTOR_NAME_TOPAZ,
-                                  INVALID_VALUE_NAME_TOPAZ,
-                                  OFFSET_NAME_TOPAZ,
+                                  SCALE_FACTOR_NAME,
+                                  INVALID_VALUE_NAME,
+                                  OFFSET_NAME,
                                   0.0,
                                   0.0,
                                   A_NAME_TOPAZ,
@@ -42,13 +42,13 @@ int main(int argc, char **argv)
 
     // Interpolate h water
     ttt = Timer();
-    n.InterpolateScalarFromNETCDF(TOPAZ_NC_FILENAME,
+    n.TopazScalarInterpolation(TOPAZ_NC_FILENAME,
                                   X_NAME_TOPAZ,
                                   Y_NAME_TOPAZ,
                                   0,
                                   "hw",
                                   "",
-                                  INVALID_VALUE_NAME_TOPAZ,
+                                  INVALID_VALUE_NAME,
                                   "",
                                   0.0,
                                   0.0,
@@ -67,14 +67,14 @@ int main(int argc, char **argv)
 
     // Interpolate h ice
     ttt = Timer();
-    n.InterpolateScalarFromNETCDF(TOPAZ_NC_FILENAME,
+    n.TopazScalarInterpolation(TOPAZ_NC_FILENAME,
                                   X_NAME_TOPAZ,
                                   Y_NAME_TOPAZ,
                                   0,
                                   "h",
-                                  SCALE_FACTOR_NAME_TOPAZ,
-                                  INVALID_VALUE_NAME_TOPAZ,
-                                  OFFSET_NAME_TOPAZ,
+                                  SCALE_FACTOR_NAME,
+                                  INVALID_VALUE_NAME,
+                                  OFFSET_NAME,
                                   0.0,
                                   0.0,
                                   H_NAME_TOPAZ,
@@ -91,16 +91,16 @@ int main(int argc, char **argv)
 
     // interpolate u ice
     ttt = Timer();
-    n.InterpolateVectorFromNETCDF(TOPAZ_NC_FILENAME,
+    n.TopazVectorInterpolation(TOPAZ_NC_FILENAME,
                                   X_NAME_TOPAZ,
                                   Y_NAME_TOPAZ,
-                                  "longitude",
-                                  "latitude",
+                                  LON_NAME,
+                                  LAT_NAME,
                                   0,
                                   "u",
-                                  SCALE_FACTOR_NAME_TOPAZ,
-                                  INVALID_VALUE_NAME_TOPAZ,
-                                  OFFSET_NAME_TOPAZ,
+                                  SCALE_FACTOR_NAME,
+                                  INVALID_VALUE_NAME,
+                                  OFFSET_NAME,
                                   0.0,
                                   0.0,
                                   U_NAME_TOPAZ,
@@ -117,16 +117,16 @@ int main(int argc, char **argv)
 
     // interpolate u water
     ttt = Timer();
-    n.InterpolateVectorFromNETCDF(TOPAZ_NC_FILENAME,
+    n.TopazVectorInterpolation(TOPAZ_NC_FILENAME,
                                   X_NAME_TOPAZ,
                                   Y_NAME_TOPAZ,
-                                  "longitude",
-                                  "latitude",
+                                  LON_NAME,
+                                  LAT_NAME,
                                   0,
                                   "uw",
-                                  SCALE_FACTOR_NAME_TOPAZ,
-                                  INVALID_VALUE_NAME_TOPAZ,
-                                  OFFSET_NAME_TOPAZ,
+                                  SCALE_FACTOR_NAME,
+                                  INVALID_VALUE_NAME,
+                                  OFFSET_NAME,
                                   0.0,
                                   0.0,
                                   UW_NAME_TOPAZ,
@@ -139,9 +139,36 @@ int main(int argc, char **argv)
     if (m.GetMesh()->GetProcessorRank() == 0)
     {
         std::cout << "u water interpolation: " << Timer() - ttt << std::endl;
+    }
+
+    // interpolate u air
+    ttt = Timer();
+    n.CamsVectorInterpolation(    CAMS_NC_FILENAME,
+                                  LON_NAME,
+                                  LAT_NAME,
+                                  0,
+                                  "ua",
+                                  SCALE_FACTOR_NAME,
+                                  INVALID_VALUE_NAME,
+                                  OFFSET_NAME,
+                                  0.0,
+                                  0.0,
+                                  UA_NAME_CAMS,
+                                  VA_NAME_CAMS,
+                                  100.0,
+                                  false,
+                                  n.GetCoords().geo_coords
+                                  );
+    BARRIER;
+    if (m.GetMesh()->GetProcessorRank() == 0)
+    {
+        std::cout << "u air interpolation: " << Timer() - ttt << std::endl;
     } 
                                   
     m.PrintPVTK("test.pvtk");
+
+
+
    
     return 0;
 }

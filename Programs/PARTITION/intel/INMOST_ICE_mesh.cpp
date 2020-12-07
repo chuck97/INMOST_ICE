@@ -250,7 +250,7 @@ INMOST::Mesh* INMOST_ICE_nodes::GetMesh()
     return ice_mesh;
 };
 
-void INMOST_ICE_nodes::InterpolateScalarFromNETCDF(const std::string& filename,
+void INMOST_ICE_nodes::TopazScalarInterpolation(const std::string& filename,
                                                    const std::string& xname,
                                                    const std::string& yname,
                                                    int netcdf_time_step,
@@ -608,8 +608,8 @@ void INMOST_ICE_nodes::InterpolateScalarFromNETCDF(const std::string& filename,
     {
         double local_x_start = x_coords[x_start];
         double local_y_start = y_coords[y_start];
-        double local_x_end = x_coords[x_start + x_count];
-        double local_y_end = y_coords[y_start + y_count];
+        double local_x_end = x_coords[x_start + x_count - 1];
+        double local_y_end = y_coords[y_start + y_count - 1];
 
         if(nodeit->GetStatus() != Element::Ghost)
         {
@@ -660,7 +660,7 @@ void INMOST_ICE_nodes::InterpolateScalarFromNETCDF(const std::string& filename,
         ERR(retval);
 };
 
-void INMOST_ICE_nodes::InterpolateVectorFromNETCDF(
+void INMOST_ICE_nodes::TopazVectorInterpolation(
                                      const std::string& filename,
                                      const std::string& xname,
                                      const std::string& yname,
@@ -683,7 +683,7 @@ void INMOST_ICE_nodes::InterpolateVectorFromNETCDF(
     if (node_data_tags.count(node_variable_name) == 0)
     {
         INMOST::Tag t;
-        t = ice_mesh->CreateTag(node_variable_name, DATA_REAL, NODE, NONE, 2);
+        t = ice_mesh->CreateTag(node_variable_name, DATA_REAL, NODE, NONE, 3);
         node_data_tags[node_variable_name] = t;
     }
 
@@ -692,6 +692,7 @@ void INMOST_ICE_nodes::InterpolateVectorFromNETCDF(
 	{
         nodeit->RealArray(node_data_tags[node_variable_name])[0] = no_extrapolation_fill;
         nodeit->RealArray(node_data_tags[node_variable_name])[1] = no_extrapolation_fill;
+        nodeit->RealArray(node_data_tags[node_variable_name])[2] = 0.0;
     }
 
     //Find extremal coords
@@ -1133,8 +1134,8 @@ void INMOST_ICE_nodes::InterpolateVectorFromNETCDF(
     {
         double local_x_start = x_coords[x_start];
         double local_y_start = y_coords[y_start];
-        double local_x_end = x_coords[x_start + x_count];
-        double local_y_end = y_coords[y_start + y_count];
+        double local_x_end = x_coords[x_start + x_count-1];
+        double local_y_end = y_coords[y_start + y_count-1];
 
         if(nodeit->GetStatus() != Element::Ghost)
         {
@@ -1198,16 +1199,893 @@ void INMOST_ICE_nodes::InterpolateVectorFromNETCDF(
     // Close file
     if ((retval = nc_close(fileid)))
         ERR(retval);
-
 }
 
-//void INMOST_ICE_nodes::InterpolateVectorFromNETCDF(std::string filename,
-//                                                   int time_step,
-//                                                   std::string node_variable_name,
-//                                                   std::string nc_variable_name_first,
-//                                                   std::string nc_variable_name_second,
-//                                                   INMOST::Tag netcdf_coords
-//                                                   )
-//{
-//
-//};
+void INMOST_ICE_nodes::CamsScalarInterpolation(
+                                     const std::string& filename,
+                                     const std::string& lonname,
+                                     const std::string& latname,
+                                     int netcdf_time_step,
+                                     const std::string& node_variable_name,
+                                     const std::string& scale_factor_name,
+                                     const std::string& invalid_value_name,
+                                     const std::string& offset_name,
+                                     double invalid_value_fill,
+                                     double no_extrapolation_fill,
+                                     const std::string& nc_variable_name,
+                                     double max_abs_value,
+                                     bool is_depth,
+                                     INMOST::Tag netcdf_coords
+                                     )
+{
+    if (node_data_tags.count(node_variable_name) == 0)
+    {
+        INMOST::Tag t;
+        t = ice_mesh->CreateTag(node_variable_name, DATA_REAL, NODE, NONE, 1);
+        node_data_tags[node_variable_name] = t;
+    }
+
+    //Fill tag with no extrapolation value
+    for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
+	{
+        nodeit->Real(node_data_tags[node_variable_name]) = no_extrapolation_fill;
+    }
+
+    //Find extremal coords
+    double min_topaz_x;
+    double min_topaz_y;
+    double max_topaz_x;
+    double max_topaz_y;
+
+    double tmp_min_x = ice_mesh->BeginNode()->RealArray(netcdf_coords)[0];
+    double tmp_max_x = ice_mesh->BeginNode()->RealArray(netcdf_coords)[0];
+    double tmp_min_y = ice_mesh->BeginNode()->RealArray(netcdf_coords)[1];
+    double tmp_max_y = ice_mesh->BeginNode()->RealArray(netcdf_coords)[1];
+
+    for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
+	{
+        if(nodeit->GetStatus() != Element::Ghost)
+        {
+            double current_x = nodeit->RealArray(netcdf_coords)[0];
+            double current_y = nodeit->RealArray(netcdf_coords)[1];
+            if (current_x <= tmp_min_x)
+            {
+                tmp_min_x = current_x;
+            }
+
+            if (current_x >= tmp_max_x)
+            {
+                tmp_max_x = current_x;
+            }
+
+            if (current_y <= tmp_min_y)
+            {
+                tmp_min_y = current_y;
+            }
+
+            if (current_y >= tmp_max_y)
+            {
+                tmp_max_y = current_y;
+            }
+        }
+    }
+    min_topaz_x = tmp_min_x;
+    min_topaz_y = tmp_min_y;
+    max_topaz_x = tmp_max_x;
+    max_topaz_y = tmp_max_y;
+
+    BARRIER
+
+    // Get coords from netcdf
+    int retval;
+    int fileid;
+
+    int lon_id, lat_id;
+    size_t x_size, y_size;
+
+    if ((retval = nc_open(filename.c_str(), NC_NOWRITE, &fileid)))
+        ERR(retval);
+
+    if((retval = nc_inq_dimid(fileid, lonname.c_str(), &lon_id)))
+        ERR(retval);
+
+    if((retval = nc_inq_dimid(fileid, latname.c_str(), &lat_id)))
+        ERR(retval);
+    
+    if((retval = nc_inq_dimlen(fileid, lon_id, &x_size)))
+        ERR(retval);
+
+    if((retval = nc_inq_dimlen(fileid, lat_id, &y_size)))
+        ERR(retval);
+    
+    double x_coords[x_size];
+    double y_coords[y_size];
+
+    int x_coords_id, y_coords_id;
+
+    if ((retval = nc_inq_varid(fileid, lonname.c_str(), &x_coords_id)))
+        ERR(retval);
+    
+    if ((retval = nc_inq_varid(fileid, latname.c_str(), &y_coords_id)))
+        ERR(retval);
+
+    if ((retval = nc_get_var_double(fileid, x_coords_id, x_coords)))
+        ERR(retval);
+    
+    if ((retval = nc_get_var_double(fileid, y_coords_id, y_coords)))
+        ERR(retval);
+
+    double dx = x_coords[1] - x_coords[0];
+    double dy = y_coords[1] - y_coords[0];
+
+    // find x start count
+    size_t x_start;
+    size_t x_count;
+
+    double max_x_begin = std::max(x_coords[0], min_topaz_x);
+    double min_x_end = std::min(x_coords[x_size -1], max_topaz_x);
+
+    if (max_x_begin > min_x_end)
+    {
+        x_count = 0;
+        x_start = 0;
+    }
+    else if (max_x_begin == x_coords[0])
+    {
+        x_start = 0;
+        x_count = std::min(size_t((max_topaz_x - x_coords[0])/dx) + 1, x_size);
+    }
+    else if (max_x_begin == min_topaz_x)
+    {
+        x_start = size_t((min_topaz_x - x_coords[0])/dx);
+        x_count = std::min((size_t)((max_topaz_x - (x_coords[0] + dx*x_start))/dx) + 1, (x_size - x_start));
+    }
+    else
+    {
+        INMOST_ICE_ERR("bad x_start x_count procedure");
+    }
+
+    // find y start count
+    size_t y_start;
+    size_t y_count;
+
+    double max_y_begin = std::max(y_coords[0], min_topaz_y);
+    double min_y_end = std::min(y_coords[y_size -1], max_topaz_y);
+
+    if (max_y_begin > min_y_end)
+    {
+        y_count = 0;
+        y_start = 0;
+    }
+    else if (max_y_begin == y_coords[0])
+    {
+        y_start = 0;
+        y_count = std::min(size_t((max_topaz_y - y_coords[0])/dy) + 1, y_size);
+    }
+    else if (max_y_begin == min_topaz_y)
+    {
+        y_start = size_t((min_topaz_y - y_coords[0])/dy);
+        y_count = std::min((size_t)((max_topaz_y - (y_coords[0] + dy*y_start))/dy) + 1, (y_size - y_start));
+    }
+    else
+    {
+        INMOST_ICE_ERR("bad y_start y_count procedure");
+    }
+
+    // Find data id
+    int data_variable_id;
+
+    if ((retval = nc_inq_varid(fileid, nc_variable_name.c_str(), &data_variable_id)))
+    {
+        ERR(retval);
+    }
+
+
+    //Get scale factor 
+    double scale_factor;
+    if (scale_factor_name.size() != 0)
+    {
+        if ((retval = nc_get_att(fileid, data_variable_id, scale_factor_name.c_str(), &scale_factor)))
+        {
+            ERR(retval);
+        }
+    }
+    else
+    {
+        scale_factor = 1.0;
+    }
+    
+    //Get invalid value
+    nc_type atttype;
+    
+    int invalid_value_int;
+    short invalid_value_short;
+    double invalid_value_double;
+
+    if (invalid_value_name.size() != 0)
+    {
+        if ((retval = nc_inq_att(fileid, data_variable_id, invalid_value_name.c_str(), &atttype, NULL)))
+            ERR(retval);
+
+        if (atttype == NC_SHORT)
+        {
+            if ((retval = nc_get_att(fileid, data_variable_id, invalid_value_name.c_str(), &invalid_value_short)))
+                ERR(retval);
+        }
+        else if ((atttype == NC_INT) or (atttype == NC_LONG))
+        {
+            if ((retval = nc_get_att(fileid, data_variable_id, invalid_value_name.c_str(), &invalid_value_int)))
+                ERR(retval);
+        }
+        else if ((atttype == NC_FLOAT) or (atttype == NC_DOUBLE))
+        {
+            if ((retval = nc_get_att(fileid, data_variable_id, invalid_value_name.c_str(), &invalid_value_double)))
+            {
+                ERR(retval);
+            }
+        }
+        else
+        {
+            INMOST_ICE_ERR("att type is not int or double, can't read");
+        }
+    }
+    else
+    {
+        invalid_value_int = std::nan("1");
+        invalid_value_double = std::nan("1");
+        invalid_value_short = std::nan("1");
+    }
+
+    //Get offset value
+    double offset_value;
+    if (offset_name.size() != 0)
+    {
+        if ((retval = nc_get_att(fileid, data_variable_id, offset_name.c_str(), &offset_value)))
+        {
+            ERR(retval);
+        }
+    }
+    else
+    {
+        offset_value = 0.0;
+    }
+
+    // Assemble start and count array
+    size_t* start;
+    size_t* count;
+
+    if (is_depth)
+    {
+        start = new size_t[4];
+        count = new size_t[4];
+        start[0] = netcdf_time_step;
+        start[1] = 0;
+        start[2] = y_start;
+        start[3] = x_start;
+        count[0] = 1;
+        count[1] = 1;
+        count[2] = y_count;
+        count[3] = x_count;
+    }
+    else
+    {
+        start = new size_t[3];
+        count = new size_t[3];
+        start[0] = netcdf_time_step;
+        start[1] = y_start;
+        start[2] = x_start;
+        count[0] = 1;
+        count[1] = y_count;
+        count[2] = x_count;
+    }
+
+    // Get data in parallel
+    int data_local_int[y_count][x_count];
+
+    short data_local_short[y_count][x_count];
+
+    double data_local_double[y_count][x_count];
+
+    if((retval = nc_inq_var(fileid, data_variable_id, NULL, &atttype, NULL, NULL, NULL)))
+        ERR(retval)
+
+    
+    if ((atttype == NC_SHORT))
+    {
+        if ((retval = nc_get_vara_short(fileid, data_variable_id, start, count, &data_local_short[0][0])))
+            ERR(retval)   
+    }
+    else if ((atttype == NC_INT) or (atttype == NC_LONG))
+    {
+        if ((retval = nc_get_vara_int(fileid, data_variable_id, start, count, &data_local_int[0][0])))
+            ERR(retval)   
+    }
+    else if ((atttype == NC_FLOAT) or (atttype == NC_DOUBLE))
+    {
+        if ((retval = nc_get_vara_double(fileid, data_variable_id, start, count, &data_local_double[0][0])))
+            ERR(retval)
+
+        if ((retval = nc_get_vara_double(fileid, data_variable_id, start, count, &data_local_double[0][0])))
+            ERR(retval)
+    }
+    else
+    {
+        INMOST_ICE_ERR("var type is not int or double, can't read");
+    }
+    
+    // convert data to double
+    if (atttype == NC_SHORT)
+    {
+        for (size_t j = 0; j < y_count; ++j)
+        {
+            for(size_t i = 0; i < x_count; ++i)
+            {
+                double current_val;
+                current_val = (data_local_short[j][i] == invalid_value_short) ? invalid_value_fill 
+                                 : (double)(data_local_short[j][i])*scale_factor + offset_value;
+                data_local_double[j][i] = current_val;
+            }
+        }
+    }           
+    else if ((atttype == NC_INT) or (atttype == NC_LONG))
+    {
+        for (size_t j = 0; j < y_count; ++j)
+        {
+            for(size_t i = 0; i < x_count; ++i)
+            {
+                double current_val;
+                current_val = (data_local_int[j][i] == invalid_value_int) ? invalid_value_fill 
+                                 : (double)(data_local_int[j][i])*scale_factor + offset_value;
+                data_local_double[j][i] = current_val;
+            }
+        }
+    }
+    else if ((atttype == NC_FLOAT) or (atttype == NC_DOUBLE))
+    {
+        for (size_t j = 0; j < y_count; ++j)
+        {
+            for(size_t i = 0; i < x_count; ++i)
+            {
+                double current_val;
+                current_val = (data_local_double[j][i] == invalid_value_double) ? invalid_value_fill 
+                                     : (data_local_double[j][i])*scale_factor + offset_value;
+                data_local_double[j][i] = current_val;
+            }
+        }
+    }
+    else
+    {
+        INMOST_ICE_ERR("unknown value type");
+    }
+
+    // get square variables
+    double local_x_start = x_coords[x_start];
+    double local_y_start = y_coords[y_start];
+    double local_x_end = x_coords[x_start + x_count - 1];
+    double local_y_end = y_coords[y_start + y_count - 1];
+
+    for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
+    {
+        if(nodeit->GetStatus() != Element::Ghost)
+        {
+            double x = nodeit->RealArray(netcdf_coords)[0];
+            double y = nodeit->RealArray(netcdf_coords)[1];
+
+            if ((x < local_x_start) or
+                (x > local_x_end) or
+                (y < local_y_start) or
+                (y > local_y_end))
+            {
+                nodeit->Real(node_data_tags[node_variable_name]) = no_extrapolation_fill;
+                continue;
+            }
+            else
+            {
+                size_t x_prev_pos = (size_t)((x - local_x_start)/dx);
+                size_t y_prev_pos = (size_t)((y - local_y_start)/dy);
+                
+                double data_ld = data_local_double[y_prev_pos][x_prev_pos];
+                double data_lu = data_local_double[y_prev_pos+1][x_prev_pos];
+                double data_rd = data_local_double[y_prev_pos][x_prev_pos+1];
+                double data_ru = data_local_double[y_prev_pos+1][x_prev_pos+1];
+
+                double xl = x_coords[x_start + x_prev_pos];
+                double xr = x_coords[x_start + x_prev_pos + 1];
+                double yd = y_coords[y_start + y_prev_pos];
+                double yu = y_coords[y_start + y_prev_pos + 1];
+
+
+                double curr_data = bilinear_interpolation(xl, xr, 
+							                                yd, yu, 
+							                                x , y,
+							                                data_ld, data_lu,
+                                                            data_rd, data_ru);
+                
+                double abs_val = fabs(curr_data);
+
+				nodeit->Real(node_data_tags[node_variable_name]) = 
+                (abs_val > max_abs_value) ? invalid_value_fill : curr_data;
+            }
+        }
+    }
+    BARRIER;
+    // Exchange data to ghost cells
+    ice_mesh->ExchangeData(node_data_tags[node_variable_name], NODE, 0);	
+    // Close file
+    if ((retval = nc_close(fileid)))
+        ERR(retval);
+}
+
+void INMOST_ICE_nodes::CamsVectorInterpolation(
+                                     const std::string& filename,
+                                     const std::string& lonname,
+                                     const std::string& latname,
+                                     int netcdf_time_step,
+                                     const std::string& node_variable_name,
+                                     const std::string& scale_factor_name,
+                                     const std::string& invalid_value_name,
+                                     const std::string& offset_name,
+                                     double invalid_value_fill,
+                                     double no_extrapolation_fill,
+                                     const std::string& nc_variable_name1,
+                                     const std::string& nc_variable_name2,
+                                     double max_abs_value,
+                                     bool is_depth,
+                                     INMOST::Tag netcdf_coords
+                                     )
+{
+    if (node_data_tags.count(node_variable_name) == 0)
+    {
+        INMOST::Tag t;
+        t = ice_mesh->CreateTag(node_variable_name, DATA_REAL, NODE, NONE, 3);
+        node_data_tags[node_variable_name] = t;
+    }
+
+    //Fill tag with no extrapolation value
+    for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
+	{
+        nodeit->RealArray(node_data_tags[node_variable_name])[0] = no_extrapolation_fill;
+        nodeit->RealArray(node_data_tags[node_variable_name])[1] = no_extrapolation_fill;
+        nodeit->RealArray(node_data_tags[node_variable_name])[2] = 0.0;
+    }
+
+    //Find extremal coords
+    double min_topaz_x;
+    double min_topaz_y;
+    double max_topaz_x;
+    double max_topaz_y;
+
+    double tmp_min_x = ice_mesh->BeginNode()->RealArray(netcdf_coords)[0];
+    double tmp_max_x = ice_mesh->BeginNode()->RealArray(netcdf_coords)[0];
+    double tmp_min_y = ice_mesh->BeginNode()->RealArray(netcdf_coords)[1];
+    double tmp_max_y = ice_mesh->BeginNode()->RealArray(netcdf_coords)[1];
+
+    for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
+	{
+        if(nodeit->GetStatus() != Element::Ghost)
+        {
+            double current_x = nodeit->RealArray(netcdf_coords)[0];
+            double current_y = nodeit->RealArray(netcdf_coords)[1];
+            if (current_x <= tmp_min_x)
+            {
+                tmp_min_x = current_x;
+            }
+
+            if (current_x >= tmp_max_x)
+            {
+                tmp_max_x = current_x;
+            }
+
+            if (current_y <= tmp_min_y)
+            {
+                tmp_min_y = current_y;
+            }
+
+            if (current_y >= tmp_max_y)
+            {
+                tmp_max_y = current_y;
+            }
+        }
+    }
+    min_topaz_x = tmp_min_x;
+    min_topaz_y = tmp_min_y;
+    max_topaz_x = tmp_max_x;
+    max_topaz_y = tmp_max_y;
+
+    BARRIER
+
+    // Get coords from netcdf
+    int retval;
+    int fileid;
+
+    int lon_id, lat_id;
+    size_t x_size, y_size;
+
+    if ((retval = nc_open(filename.c_str(), NC_NOWRITE, &fileid)))
+        ERR(retval);
+
+    if((retval = nc_inq_dimid(fileid, lonname.c_str(), &lon_id)))
+        ERR(retval);
+
+    if((retval = nc_inq_dimid(fileid, latname.c_str(), &lat_id)))
+        ERR(retval);
+    
+    if((retval = nc_inq_dimlen(fileid, lon_id, &x_size)))
+        ERR(retval);
+
+    if((retval = nc_inq_dimlen(fileid, lat_id, &y_size)))
+        ERR(retval);
+    
+    double x_coords[x_size];
+    double y_coords[y_size];
+
+    int x_coords_id, y_coords_id;
+
+    if ((retval = nc_inq_varid(fileid, lonname.c_str(), &x_coords_id)))
+        ERR(retval);
+    
+    if ((retval = nc_inq_varid(fileid, latname.c_str(), &y_coords_id)))
+        ERR(retval);
+
+    if ((retval = nc_get_var_double(fileid, x_coords_id, x_coords)))
+        ERR(retval);
+    
+    if ((retval = nc_get_var_double(fileid, y_coords_id, y_coords)))
+        ERR(retval);
+
+    double dx = x_coords[1] - x_coords[0];
+    double dy = y_coords[1] - y_coords[0];
+
+    // find x start count
+    size_t x_start;
+    size_t x_count;
+
+    double max_x_begin = std::max(x_coords[0], min_topaz_x);
+    double min_x_end = std::min(x_coords[x_size -1], max_topaz_x);
+
+    if (max_x_begin > min_x_end)
+    {
+        x_count = 0;
+        x_start = 0;
+    }
+    else if (max_x_begin == x_coords[0])
+    {
+        x_start = 0;
+        x_count = std::min(size_t((max_topaz_x - x_coords[0])/dx) + 1, x_size);
+    }
+    else if (max_x_begin == min_topaz_x)
+    {
+        x_start = size_t((min_topaz_x - x_coords[0])/dx);
+        x_count = std::min((size_t)((max_topaz_x - (x_coords[0] + dx*x_start))/dx) + 1, (x_size - x_start));
+    }
+    else
+    {
+        INMOST_ICE_ERR("bad x_start x_count procedure");
+    }
+
+    // find y start count
+    size_t y_start;
+    size_t y_count;
+
+    double max_y_begin = std::max(y_coords[0], min_topaz_y);
+    double min_y_end = std::min(y_coords[y_size -1], max_topaz_y);
+
+    if (max_y_begin > min_y_end)
+    {
+        y_count = 0;
+        y_start = 0;
+    }
+    else if (max_y_begin == y_coords[0])
+    {
+        y_start = 0;
+        y_count = std::min(size_t((max_topaz_y - y_coords[0])/dy) + 1, y_size);
+    }
+    else if (max_y_begin == min_topaz_y)
+    {
+        y_start = size_t((min_topaz_y - y_coords[0])/dy);
+        y_count = std::min((size_t)((max_topaz_y - (y_coords[0] + dy*y_start))/dy) + 1, (y_size - y_start));
+    }
+    else
+    {
+        INMOST_ICE_ERR("bad y_start y_count procedure");
+    }
+
+    // Find data id
+    int data_variable1_id;
+    int data_variable2_id;
+
+    if ((retval = nc_inq_varid(fileid, nc_variable_name1.c_str(), &data_variable1_id)))
+    {
+        ERR(retval);
+    }
+
+    if ((retval = nc_inq_varid(fileid, nc_variable_name2.c_str(), &data_variable2_id)))
+    {
+        ERR(retval);
+    }
+
+
+    //Get scale factor 
+    double scale_factor;
+    if (scale_factor_name.size() != 0)
+    {
+        if ((retval = nc_get_att(fileid, data_variable1_id, scale_factor_name.c_str(), &scale_factor)))
+        {
+            ERR(retval);
+        }
+    }
+    else
+    {
+        scale_factor = 1.0;
+    }
+    
+    //Get invalid value
+    nc_type atttype;
+    
+    int invalid_value_int;
+    short invalid_value_short;
+    double invalid_value_double;
+
+    if (invalid_value_name.size() != 0)
+    {
+        if ((retval = nc_inq_att(fileid, data_variable1_id, invalid_value_name.c_str(), &atttype, NULL)))
+            ERR(retval);
+
+        if (atttype == NC_SHORT)
+        {
+            if ((retval = nc_get_att(fileid, data_variable1_id, invalid_value_name.c_str(), &invalid_value_short)))
+                ERR(retval);
+        }
+        else if ((atttype == NC_INT) or (atttype == NC_LONG))
+        {
+            if ((retval = nc_get_att(fileid, data_variable1_id, invalid_value_name.c_str(), &invalid_value_int)))
+                ERR(retval);
+        }
+        else if ((atttype == NC_FLOAT) or (atttype == NC_DOUBLE))
+        {
+            if ((retval = nc_get_att(fileid, data_variable1_id, invalid_value_name.c_str(), &invalid_value_double)))
+            {
+                ERR(retval);
+            }
+        }
+        else
+        {
+            INMOST_ICE_ERR("att type is not int or double, can't read");
+        }
+    }
+    else
+    {
+        invalid_value_int = std::nan("1");
+        invalid_value_double = std::nan("1");
+        invalid_value_short = std::nan("1");
+    }
+
+    //Get offset value
+    double offset_value;
+    if (offset_name.size() != 0)
+    {
+        if ((retval = nc_get_att(fileid, data_variable1_id, offset_name.c_str(), &offset_value)))
+        {
+            ERR(retval);
+        }
+    }
+    else
+    {
+        offset_value = 0.0;
+    }
+
+    // Assemble start and count array
+    size_t* start;
+    size_t* count;
+
+    if (is_depth)
+    {
+        start = new size_t[4];
+        count = new size_t[4];
+        start[0] = netcdf_time_step;
+        start[1] = 0;
+        start[2] = y_start;
+        start[3] = x_start;
+        count[0] = 1;
+        count[1] = 1;
+        count[2] = y_count;
+        count[3] = x_count;
+    }
+    else
+    {
+        start = new size_t[3];
+        count = new size_t[3];
+        start[0] = netcdf_time_step;
+        start[1] = y_start;
+        start[2] = x_start;
+        count[0] = 1;
+        count[1] = y_count;
+        count[2] = x_count;
+    }
+
+    // Get data in parallel
+    int vector_data_local_int1[y_count][x_count];
+    int vector_data_local_int2[y_count][x_count];
+
+    short vector_data_local_short1[y_count][x_count];
+    short vector_data_local_short2[y_count][x_count];
+
+    double vector_data_local_double1[y_count][x_count];
+    double vector_data_local_double2[y_count][x_count];
+
+    if((retval = nc_inq_var(fileid, data_variable1_id, NULL, &atttype, NULL, NULL, NULL)))
+        ERR(retval)
+
+    
+    if ((atttype == NC_SHORT))
+    {
+        if ((retval = nc_get_vara_short(fileid, data_variable1_id, start, count, &vector_data_local_short1[0][0])))
+            ERR(retval)
+        
+        if ((retval = nc_get_vara_short(fileid, data_variable2_id, start, count, &vector_data_local_short2[0][0])))
+            ERR(retval)
+    }
+    else if ((atttype == NC_INT) or (atttype == NC_LONG))
+    {
+        if ((retval = nc_get_vara_int(fileid, data_variable1_id, start, count, &vector_data_local_int1[0][0])))
+            ERR(retval)
+        
+        if ((retval = nc_get_vara_int(fileid, data_variable2_id, start, count, &vector_data_local_int2[0][0])))
+            ERR(retval)
+    }
+    else if ((atttype == NC_FLOAT) or (atttype == NC_DOUBLE))
+    {
+        if ((retval = nc_get_vara_double(fileid, data_variable1_id, start, count, &vector_data_local_double1[0][0])))
+            ERR(retval)
+
+        if ((retval = nc_get_vara_double(fileid, data_variable2_id, start, count, &vector_data_local_double2[0][0])))
+            ERR(retval)
+    }
+    else
+    {
+        INMOST_ICE_ERR("var type is not int or double, can't read");
+    }
+    
+    // convert velocity components to double
+    if (atttype == NC_SHORT)
+    {
+        for (size_t j = 0; j < y_count; ++j)
+        {
+            for(size_t i = 0; i < x_count; ++i)
+            {
+                double current_val_x, current_val_y;
+                current_val_x = (vector_data_local_short1[j][i] == invalid_value_short) ? invalid_value_fill 
+                                 : (double)(vector_data_local_short1[j][i])*scale_factor + offset_value;
+                current_val_y = (vector_data_local_short2[j][i] == invalid_value_short) ? invalid_value_fill
+                                 : (double)(vector_data_local_short2[j][i])*scale_factor + offset_value; 
+                vector_data_local_double1[j][i] = current_val_x;
+                vector_data_local_double2[j][i] = current_val_y;
+            }
+        }
+    }           
+    else if ((atttype == NC_INT) or (atttype == NC_LONG))
+    {
+        for (size_t j = 0; j < y_count; ++j)
+        {
+            for(size_t i = 0; i < x_count; ++i)
+            {
+                double current_val_x, current_val_y;
+                current_val_x = (vector_data_local_int1[j][i] == invalid_value_int) ? invalid_value_fill 
+                                 : (double)(vector_data_local_int1[j][i])*scale_factor + offset_value;
+                current_val_y = (vector_data_local_int2[j][i] == invalid_value_int) ? invalid_value_fill
+                                 : (double)(vector_data_local_int2[j][i])*scale_factor + offset_value;
+                vector_data_local_double1[j][i] = current_val_x;
+                vector_data_local_double2[j][i] = current_val_y;
+            }
+        }
+    }
+    else if ((atttype == NC_FLOAT) or (atttype == NC_DOUBLE))
+    {
+        for (size_t j = 0; j < y_count; ++j)
+        {
+            for(size_t i = 0; i < x_count; ++i)
+            {
+                 double current_val_x, current_val_y;
+                current_val_x = (vector_data_local_double1[j][i] == invalid_value_double) ? invalid_value_fill 
+                                     : (vector_data_local_double1[j][i])*scale_factor + offset_value;
+                current_val_y = (vector_data_local_double2[j][i] == invalid_value_double) ? invalid_value_fill 
+                                     : (vector_data_local_double2[j][i])*scale_factor + offset_value;
+                vector_data_local_double1[j][i] = current_val_x;
+                vector_data_local_double2[j][i] = current_val_y;
+            }
+        }
+    }
+    else
+    {
+        INMOST_ICE_ERR("unknown value type");
+    }
+
+    // rotate vector to model directions
+    double rotated_vector_x[y_count][x_count];
+    double rotated_vector_y[y_count][x_count];
+
+    for (size_t j = 0; j < y_count; ++j)
+    {
+        for (size_t i = 0; i < x_count; ++i)
+        {
+            double vec_x = vector_data_local_double1[j][i];
+            double vec_y = vector_data_local_double2[j][i];
+            std::vector<double> model_rot_vec = from_geo_2_model_vec<double>(vec_x, vec_y,
+                                                                             x_coords[x_start + i],
+                                                                             y_coords[y_start + j]);
+            rotated_vector_x[j][i] = model_rot_vec[0];
+            rotated_vector_y[j][i] = model_rot_vec[1];
+       }
+    }
+
+    double local_x_start = x_coords[x_start];
+    double local_y_start = y_coords[y_start];
+    double local_x_end = x_coords[x_start + x_count - 1];
+    double local_y_end = y_coords[y_start + y_count - 1];
+
+    // get square variables
+    for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
+    {
+        if(nodeit->GetStatus() != Element::Ghost)
+        {
+            double x = nodeit->RealArray(netcdf_coords)[0];
+            double y = nodeit->RealArray(netcdf_coords)[1];
+
+            if ((x < local_x_start) or
+                (x > local_x_end) or
+                (y < local_y_start) or
+                (y > local_y_end))
+            {
+                nodeit->RealArray(node_data_tags[node_variable_name])[0] = no_extrapolation_fill;
+                nodeit->RealArray(node_data_tags[node_variable_name])[1] = no_extrapolation_fill;
+                continue;
+            }
+            else
+            {
+                size_t x_prev_pos = (size_t)((x - local_x_start)/dx);
+                size_t y_prev_pos = (size_t)((y - local_y_start)/dy);
+                
+                double datax_ld = rotated_vector_x[y_prev_pos][x_prev_pos];
+                double datax_lu = rotated_vector_x[y_prev_pos+1][x_prev_pos];
+                double datax_rd = rotated_vector_x[y_prev_pos][x_prev_pos+1];
+                double datax_ru = rotated_vector_x[y_prev_pos+1][x_prev_pos+1];
+
+                double datay_ld = rotated_vector_y[y_prev_pos][x_prev_pos];
+                double datay_lu = rotated_vector_y[y_prev_pos+1][x_prev_pos];
+                double datay_rd = rotated_vector_y[y_prev_pos][x_prev_pos+1];
+                double datay_ru = rotated_vector_y[y_prev_pos+1][x_prev_pos+1];
+
+                double xl = x_coords[x_start + x_prev_pos];
+                double xr = x_coords[x_start + x_prev_pos + 1];
+                double yd = y_coords[y_start + y_prev_pos];
+                double yu = y_coords[y_start + y_prev_pos + 1];
+
+
+                double curr_data_x = bilinear_interpolation(xl, xr, 
+							                                yd, yu, 
+							                                x , y,
+							                                datax_ld, datax_lu,
+                                                            datax_rd, datax_ru);
+                
+                double curr_data_y = bilinear_interpolation(xl, xr, 
+							                                yd, yu, 
+							                                x , y,
+							                                datay_ld, datay_lu,
+                                                            datay_rd, datay_ru);
+
+                double abs_val = sqrt(curr_data_x*curr_data_x + curr_data_y*curr_data_y);
+
+				nodeit->RealArray(node_data_tags[node_variable_name])[0] = 
+                (abs_val > max_abs_value) ? invalid_value_fill : curr_data_x;
+                nodeit->RealArray(node_data_tags[node_variable_name])[1] = 
+                (abs_val > max_abs_value) ? invalid_value_fill : curr_data_y;
+            }
+        }
+    }
+    BARRIER;
+    // Exchange data to ghost cells
+    ice_mesh->ExchangeData(node_data_tags[node_variable_name], NODE, 0);	
+    // Close file
+    if ((retval = nc_close(fileid)))
+        ERR(retval);
+}

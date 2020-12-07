@@ -1,6 +1,5 @@
 #pragma once
 #include "config.h"
-#include "INMOST_ICE_mesh.h"
 
 static inline void ltrim(std::string &s);
 static inline void rtrim(std::string &s);
