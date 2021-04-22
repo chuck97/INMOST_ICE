@@ -2,33 +2,6 @@
 
 using namespace INMOST;
 
-// trim from start (in place)
-static inline void ltrim(std::string &s) 
-{
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), 
-    [](unsigned char ch) 
-    {
-        return !std::isspace(ch);
-    }));
-};
-
-// trim from end (in place)
-static inline void rtrim(std::string &s) 
-{
-    s.erase(std::find_if(s.rbegin(), s.rend(), 
-    [](unsigned char ch) 
-    {
-        return !std::isspace(ch);
-    }).base(), s.end());
-};
-
-// trim from both ends (in place)
-static inline void trim(std::string &s) 
-{
-    ltrim(s);
-    rtrim(s);
-};
-
 INMOST_ICE_mesh::INMOST_ICE_mesh(const std::string& mesh_path)
 {
     Mesh::Initialize(NULL, NULL);
@@ -184,49 +157,7 @@ INMOST::Mesh* INMOST_ICE_mesh::GetMesh()
     return ice_mesh;
 };
 
-
-INMOST_ICE_nodes::INMOST_ICE_nodes(INMOST::Mesh* m)
+INMOST_ICE_mesh_data* INMOST_ICE_mesh::GetMeshData()
 {
-    ice_mesh = m;
-    double ttt = Timer();
-
-    nc.model_coords = ice_mesh->CreateTag("model coords", DATA_REAL, NODE, NONE, 2);
-    nc.geo_coords = ice_mesh->CreateTag("geo coords", DATA_REAL, NODE, NONE, 2);
-    nc.topaz_coords = ice_mesh->CreateTag("TOPAZ coords", DATA_REAL, NODE, NONE, 2);    
-
-    for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
-	{
-        // Assign model coords
-		nodeit->RealArray(nc.model_coords)[0] = nodeit->Coords()[0];
-        nodeit->RealArray(nc.model_coords)[1] = nodeit->Coords()[1];
-
-        
-        // Assign geo coords
-        std::vector<double> geo = from_model_2_geo<double>(nodeit->RealArray(nc.model_coords)[0],
-                                                           nodeit->RealArray(nc.model_coords)[1]);
-        nodeit->RealArray(nc.geo_coords)[0] = geo[0];
-        nodeit->RealArray(nc.geo_coords)[1] = geo[1];
-        
-        // Assign TOPAZ coords
-        std::vector<double> topaz = from_geo_2_topaz(nodeit->RealArray(nc.geo_coords)[0],
-                                                     nodeit->RealArray(nc.geo_coords)[1]);
-        nodeit->RealArray(nc.topaz_coords)[0] = topaz[0]/1e5;
-        nodeit->RealArray(nc.topaz_coords)[1] = topaz[1]/1e5;
-
-        // Assign 
-    }
-    if (ice_mesh->GetProcessorRank() == 0)
-    {
-        std::cout << "Assigning coords: " <<  Timer() - ttt <<std::endl;
-    }
-};
-
-NodeCoords& INMOST_ICE_nodes::GetCoords()
-{
-    return nc;
-};
-
-INMOST::Mesh* INMOST_ICE_nodes::GetMesh()
-{
-    return ice_mesh;
+    return &data;
 };

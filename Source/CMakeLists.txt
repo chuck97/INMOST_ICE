@@ -17,6 +17,7 @@ add_subdirectory(Solver)
 add_subdirectory(Thermodynamics)
 add_subdirectory(Interpolation)
 add_subdirectory(Headers)
+add_subdirectory(Services)
 
 include_directories(Headers)
 

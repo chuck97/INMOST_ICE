@@ -1,0 +1,33 @@
+{
+  "Mesh": "/data90t/geosci/spetrov/TRANSPORT_TESTS/PMF_3D_GENERATION/build/grid.pmf",
+  "Total time (h)": 300.0,
+   "Initial Mass": {
+        "type": "slotted cylinders",
+        "amplitude": 1.0,
+        "scale factor": 1.0,
+        "radius": 0.5,
+        "background": 0.0,
+        "width": 5.0,
+        "first center coords": [2.3561944901, 0.0],
+        "second center coords": [3.9269908169, 0.0]
+  },
+  "Velocity Field": {
+    "type": "non-div3",
+    "Courant number": 0.2,
+    "scale factor (m/s)":40.0  
+  },
+  "Advection Solver": {
+    "type": "CG2",
+    "FCT": true,
+    "cd": 0.5
+  },
+  "Output Parameters": {
+    "verbose": true,
+    "print errors": true,
+    "number of screenshots": 100,
+    "output directory": "./screenshots/",
+    "keymoments directory": "./keymoments/",
+    "mass file": "./MassInt.txt"
+  }
+}
+

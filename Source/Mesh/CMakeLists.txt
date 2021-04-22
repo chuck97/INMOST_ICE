@@ -2,5 +2,7 @@ set(
 	SOURCE
 	${SOURCE}
 	${CMAKE_CURRENT_SOURCE_DIR}/mesh.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/nodes.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/triangles.cpp
 	PARENT_SCOPE
 )

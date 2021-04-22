@@ -10,10 +10,10 @@ int main(int argc, char **argv)
     INMOST_ICE_mesh m((std::string)PMF_PATH);
 
     // nodes initialization
-    INMOST_ICE_nodes n(m.GetMesh());
-
-    // read data from .netcdf in parallel
-    //n.ReadNodeData();
+    INMOST_ICE_nodes n(m);
+    
+    // triangles initialization
+    INMOST_ICE_triangles t(m);
 
     // Interpolate a ice
     ttt = Timer();

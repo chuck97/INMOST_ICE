@@ -5,6 +5,8 @@ set(
         ${CMAKE_CURRENT_SOURCE_DIR}/coords_rotation.h
         ${CMAKE_CURRENT_SOURCE_DIR}/interpolators.h
         ${CMAKE_CURRENT_SOURCE_DIR}/mesh.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/nodes.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/triangles.h
 	${CMAKE_CURRENT_SOURCE_DIR}/inmost_ice.h
         PARENT_SCOPE
 )

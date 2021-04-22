@@ -1,0 +1,7 @@
+set(
+	SOURCE
+	${SOURCE}
+	${CMAKE_CURRENT_SOURCE_DIR}/linetrim.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/triancalcs.cpp
+	PARENT_SCOPE
+)

@@ -1,0 +1,33 @@
+{
+  "Mesh": "/data90t/geosci/spetrov/TRANSPORT_TESTS/PMF_3D_GENERATION/build/grid.pmf",
+  "Total time (h)": 300.0,
+   "Initial Mass": {
+        "type": "Gaussian hills",
+        "amplitude": 1.0,
+        "scale factor": 0.0,
+        "radius": 0.0,
+        "background": 0.0,
+        "width": 5.0,
+        "first center coords": [2.3561944901, 0.0],
+        "second center coords": [3.9269908169, 0.0]
+  },
+  "Velocity Field": {
+    "type": "non-div2",
+    "Courant number": 0.4,
+    "scale factor (m/s)":80.0  
+  },
+  "Advection Solver": {
+    "type": "TTG2",
+    "FCT": true,
+    "cd": 0.5
+  },
+  "Output Parameters": {
+    "verbose": true,
+    "print errors": true,
+    "number of screenshots": 100,
+    "output directory": "./screenshots/",
+    "keymoments directory": "./keymoments/",
+    "mass file": "./MassInt.txt"
+  }
+}
+

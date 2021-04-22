@@ -19,17 +19,17 @@ void INMOST_ICE_nodes::CamsScalarInterpolation(
                                      INMOST::Tag netcdf_coords
                                      )
 {
-    if (node_data_tags.count(node_variable_name) == 0)
+    if (data.node_data.count(node_variable_name) == 0)
     {
         INMOST::Tag t;
         t = ice_mesh->CreateTag(node_variable_name, DATA_REAL, NODE, NONE, 1);
-        node_data_tags[node_variable_name] = t;
+        data.node_data[node_variable_name] = t;
     }
 
     //Fill tag with no extrapolation value
     for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
 	{
-        nodeit->Real(node_data_tags[node_variable_name]) = no_extrapolation_fill;
+        nodeit->Real(data.node_data[node_variable_name]) = no_extrapolation_fill;
     }
 
     //Find extremal coords
@@ -404,14 +404,14 @@ void INMOST_ICE_nodes::CamsScalarInterpolation(
                 
                 double abs_val = fabs(curr_data);
 
-				nodeit->Real(node_data_tags[node_variable_name]) = 
+				nodeit->Real(data.node_data[node_variable_name]) = 
                 (abs_val > max_abs_value) ? invalid_value_fill : curr_data;
             }
         }
     }
     BARRIER;
     // Exchange data to ghost cells
-    ice_mesh->ExchangeData(node_data_tags[node_variable_name], NODE, 0);	
+    ice_mesh->ExchangeData(data.node_data[node_variable_name], NODE, 0);	
     // Close file
     if ((retval = nc_close(fileid)))
         ERR(retval);
@@ -435,19 +435,19 @@ void INMOST_ICE_nodes::CamsVectorInterpolation(
                                      INMOST::Tag netcdf_coords
                                      )
 {
-    if (node_data_tags.count(node_variable_name) == 0)
+    if (data.node_data.count(node_variable_name) == 0)
     {
         INMOST::Tag t;
         t = ice_mesh->CreateTag(node_variable_name, DATA_REAL, NODE, NONE, 3);
-        node_data_tags[node_variable_name] = t;
+        data.node_data[node_variable_name] = t;
     }
 
     //Fill tag with no extrapolation value
     for(Mesh::iteratorNode nodeit = ice_mesh->BeginNode(); nodeit != ice_mesh->EndNode(); ++nodeit) 
 	{
-        nodeit->RealArray(node_data_tags[node_variable_name])[0] = no_extrapolation_fill;
-        nodeit->RealArray(node_data_tags[node_variable_name])[1] = no_extrapolation_fill;
-        nodeit->RealArray(node_data_tags[node_variable_name])[2] = 0.0;
+        nodeit->RealArray(data.node_data[node_variable_name])[0] = no_extrapolation_fill;
+        nodeit->RealArray(data.node_data[node_variable_name])[1] = no_extrapolation_fill;
+        nodeit->RealArray(data.node_data[node_variable_name])[2] = 0.0;
     }
 
     //Find extremal coords
@@ -876,9 +876,9 @@ void INMOST_ICE_nodes::CamsVectorInterpolation(
 
                 double abs_val = sqrt(curr_data_x*curr_data_x + curr_data_y*curr_data_y);
 
-				nodeit->RealArray(node_data_tags[node_variable_name])[0] = 
+				nodeit->RealArray(data.node_data[node_variable_name])[0] = 
                 (abs_val > max_abs_value) ? invalid_value_fill : curr_data_x;
-                nodeit->RealArray(node_data_tags[node_variable_name])[1] = 
+                nodeit->RealArray(data.node_data[node_variable_name])[1] = 
                 (abs_val > max_abs_value) ? invalid_value_fill : curr_data_y;
             }
         }
